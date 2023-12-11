@@ -29,13 +29,12 @@ server.listen(port, () => {
 
 io.on("connection", (socket) => {
   socket.on("login", (user) => {
-    console.log(`User ${user.name} logged in`);
-    io.emit("login", user);
+    io.emit("login", {type: "announcement", text: `joined.`, user: user, privite: true});
   });
   socket.on("chat message", (msg) => {
     msg.text = msg.text.length > 150 ? `${msg.text.slice(0, 150)}...` : msg.text
     console.log(msg);
-    io.emit("message", msg);
+    io.emit("message", {type: "message", text: msg.text, user: msg.user});
   });
 
   socket.on("disconnect", () => {

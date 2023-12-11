@@ -26,9 +26,7 @@ export default function Login(props) {
         theme='filled_blue'
         shape='circle'
         onSuccess={response => {
-            console.log('Login Success');
             var responseDecoded = jwtDecode(response.credential);
-            console.log(responseDecoded)
             setLogin(true);
             socket.emit('login', responseDecoded);
             setUser({
