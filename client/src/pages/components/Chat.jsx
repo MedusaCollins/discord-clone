@@ -47,13 +47,13 @@ export default function Chat(props) {
     };
 
     return (
-        <div className="bottom-0 p-5 w-full fixed bg-primary">
+        <div className="bottom-0 p-5 w-full fixed bg-primary transition-all">
             <ul className="overflow-auto mb-3 max-h-36" ref={chatAreaRef}>
                 {messages.map((message, index) => (
                     <div key={index} className="text-white my-1 p-1 flex">
                         <img src={message.user.imageUrl} className="rounded-full w-8" alt="User" />
                         <div className="flex gap-2 my-auto mx-2">
-                            <h2 className="text-green-500">{message.user.name}:</h2>
+                            <h2 className={`${message.user.name === user.name?'text-green-500':'text-yellow-500'}`}>{message.user.name}:</h2>
                             <p>{message.text}</p>
                         </div>
                     </div>

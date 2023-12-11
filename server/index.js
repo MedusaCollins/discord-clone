@@ -33,8 +33,8 @@ io.on("connection", (socket) => {
     io.emit("login", user);
   });
   socket.on("chat message", (msg) => {
+    msg.text = msg.text.length > 150 ? `${msg.text.slice(0, 150)}...` : msg.text
     console.log(msg);
-    console.log(`Message: ${msg.text}`);
     io.emit("message", msg);
   });
 
