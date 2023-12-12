@@ -46,7 +46,7 @@ export default function Chat(props) {
     };
 
     return (
-        <div className="p-5 w-full bg-primary">
+        <div className="px-5 w-full">
             <ul className="overflow-auto mb-3 max-h-36 h-36" ref={chatAreaRef}>
                 {messages.map((message, index) => (
                         <div key={index}>
