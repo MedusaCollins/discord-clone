@@ -1,11 +1,23 @@
 const data = [
 {
-    id: 1,
     name: 'Meduware',
     image: 'https://lh3.googleusercontent.com/a/ACg8ocJUsNIwm70oAlbkR3-J-XJ4RoN2ySL-YK_hCqp2C4Wzmg=s96-c',
     channels: [
         {
-            name: 'General',
+            name: 'Generalchat',
+            type: 'text',
+            access: {read: ['Owner','Admin','Moderator','Member','Guest'], write: ['Owner','Admin','Moderator','Member']},
+            messages: 
+                [
+                    {
+                        message: 'Hello World', 
+                        user:{name: 'Medusa Collins',email: 'collinsmedusa@gmail.com',imageUrl:'https://lh3.googleusercontent.com/a/ACg8ocJUsNIwm70oAlbkR3-J-XJ4RoN2ySL-YK_hCqp2C4Wzmg=s96-c'}
+                    }
+                ]
+        },
+        {
+            name: 'Generalvc',
+            type: 'voice',
             access: {read: ['Owner','Admin','Moderator','Member','Guest'], write: ['Owner','Admin','Moderator','Member']},
             messages: 
                 [
