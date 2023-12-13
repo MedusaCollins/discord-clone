@@ -1,8 +1,10 @@
-import React, { useState} from 'react';
+import React, { useEffect, useState} from 'react';
+import { io } from 'socket.io-client';
 
 const LobbyModule = (props) => {
+  const socket = io(process.env.REACT_APP_SERVER);
   const [showDiv, setShowDiv] = useState(false);
-  const {user,rooms, setRooms } = props;
+  const {user, setRooms } = props;
   const [Lobby, setLobby] = useState({
     name: 'test',
     tags: [''],
@@ -14,10 +16,12 @@ const LobbyModule = (props) => {
     maxPlayer: '8',
   });
 
-  function createLobby() {
-    setShowDiv(true);
+  function createLobby(Lobby){
+    // console.log(Lobby)
+    socket.emit('create lobby', Lobby)
   }
 
+  
   function input(placeholder, onChange) {
     return (
       <input
@@ -31,7 +35,7 @@ const LobbyModule = (props) => {
 
   return (
     <div className='text-white flex gap-5 items-center mx-auto place-content-center'>
-      <button onClick={() => createLobby()} className='p-2 bg-blue-500 hover:bg-blue-600 rounded-lg'>
+      <button onClick={() => setShowDiv(true)} className='p-2 bg-blue-500 hover:bg-blue-600 rounded-lg'>
         New Game
       </button>
       <button className='p-2 bg-green-500 hover:bg-green-600 rounded-lg'>Quick Join</button>
@@ -60,7 +64,7 @@ const LobbyModule = (props) => {
                   </select>
                 </div>
               </div>
-              <button type="submit" onClick={() => setRooms([...rooms, Lobby])} className='bg-green-600 hover:bg-green-700 text-white p-1.5 rounded-2xl transition mt-4'>
+              <button type="submit" onClick={() => createLobby(Lobby)} className='bg-green-600 hover:bg-green-700 text-white p-1.5 rounded-2xl transition mt-4'>
                 Create Lobby
               </button>
             </div>
