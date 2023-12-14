@@ -4,7 +4,7 @@ const data = [
     image: 'https://lh3.googleusercontent.com/a/ACg8ocJUsNIwm70oAlbkR3-J-XJ4RoN2ySL-YK_hCqp2C4Wzmg=s96-c',
     channels: [
         {
-            name: 'Generalchat',
+            name: 'General 1',
             type: 'text',
             access: {read: ['Owner','Admin','Moderator','Member','Guest'], write: ['Owner','Admin','Moderator','Member']},
             messages: 
@@ -20,8 +20,8 @@ const data = [
                 ]
         },
         {
-            name: 'Generalvc',
-            type: 'voice',
+            name: 'General 2',
+            type: 'text',
             access: {read: ['Owner','Admin','Moderator','Member','Guest'], write: ['Owner','Admin','Moderator','Member']},
             messages: 
                 [
@@ -34,7 +34,16 @@ const data = [
     ],
     serverUsers: [
         {
-            name: 'Medusa Collins',email: 'collinsmedusa@gmail.com',imageUrl:'https://lh3.googleusercontent.com/a/ACg8ocJUsNIwm70oAlbkR3-J-XJ4RoN2ySL-YK_hCqp2C4Wzmg=s96-c'
+            name: 'Medusa Collins',
+            email: 'collinsmedusa@gmail.com',
+            imageUrl:'https://lh3.googleusercontent.com/a/ACg8ocJUsNIwm70oAlbkR3-J-XJ4RoN2ySL-YK_hCqp2C4Wzmg=s96-c',
+            roles: ['Owner']
+        },
+        {
+            name: 'Medusa Collins',
+            email: 'collinsmedusa@gmail.com',
+            imageUrl:'https://lh3.googleusercontent.com/a/ACg8ocJUsNIwm70oAlbkR3-J-XJ4RoN2ySL-YK_hCqp2C4Wzmg=s96-c',
+            roles: ['Owner']
         }
     ],
     serverRoles: [

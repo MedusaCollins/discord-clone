@@ -17,13 +17,13 @@ const Channels = (params) => {
 
           {data[selected.server].channels.map((channel,index) => (
             <div key={index} onClick={() => (selected.channel!==index ? setSelected({...selected, channel:index}) : null)} 
-                className={`flex items-center h-7 mx-2 my-1 px-2 cursor-pointer hover:bg-black-hover rounded-lg transition-all
-                ${selected.channel===index ? 'bg-black-hover' :''}`}>
+                className={`flex items-center h-7 mx-2 my-1 px-2 cursor-pointer rounded-md transition-all
+                ${selected.channel===index ? 'bg-black-focus' :'hover:bg-black-hover'}`}>
 
-              <p className='text-sm flex gap-5 items-center'>
+              <span className='text-sm text-[#80848E] flex gap-5 items-center'>
                 {channel.type==='text' ? <FontAwesomeIcon icon={faHashtag} className='mx-0.5'/> :
-                 <FontAwesomeIcon icon={faVolumeHigh} />} {channel.name}
-              </p>
+                 <FontAwesomeIcon icon={faVolumeHigh} />} <span className={`${selected.channel===index ? 'text-white' :''}`} >{channel.name}</span>
+              </span>
             </div>
           ))}
         </div>

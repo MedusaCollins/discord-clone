@@ -21,7 +21,7 @@ export default function Home(params) {
             <ServerSelect selected={selected} setSelected={setSelected} user={user}/>
             <Channels selected={selected} setSelected={setSelected} user={user}/>
             <ChatBox selected={selected} user={user}/>
-            <Users/>
+            <Users selected={selected} user={user}/>
         </div>
     )
 }

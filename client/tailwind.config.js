@@ -5,14 +5,18 @@ module.exports = {
     extend: {
       colors:{
         black: {
-          hover: "#3f4146",
+          focus: "#404249",
+          hover: "#35373C",
           50: "#383A40",
           100: "#313338",
           200: "#2c2f33",
           300: "#232428",
           400: "#1E1F22"
         },
-        gray: "#B5BAC1",
+        gray: {
+          100: "#B5BAC1",
+          200: "#80848E"
+        },
         blue: "#7289da"
       }
     },
