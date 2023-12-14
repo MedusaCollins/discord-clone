@@ -10,11 +10,11 @@ const ChatBox = (params) => {
       <div className="w-[80%] h-screen flex flex-col justify-between text-sm bg-black-100">
         {selected.server !== null && selected.channel !== null ? (
           <div>
-              {data[params.selected.server].channels[params.selected.channel].messages.map((msg,index) => (
+              {data[selected.server].channels[selected.channel].messages.map((msg,index) => (
                 <div key={index} className='flex space-x-5 m-5 p-2 rounded-xl items-center hover:bg-black-200'>
                   <img src={msg.user.imageUrl} alt="" className='w-8 h-8 rounded-full'/>
                   <div>
-                    <p>{msg.user.name}</p>
+                    <p style={{ color: `${data[selected.server].serverRoles.find(role => role.name === msg.user.roles[0]).color}` }}>{msg.user.name}</p>
                     <p className='text-slate-100 text-xs'>{msg.message}</p>
                   </div>
                 </div>

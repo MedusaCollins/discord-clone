@@ -11,11 +11,19 @@ const data = [
                 [
                     {
                         message: 'Hello World', 
-                        user:{name: 'Medusa Collins',email: 'collinsmedusa@gmail.com',imageUrl:'https://lh3.googleusercontent.com/a/ACg8ocJUsNIwm70oAlbkR3-J-XJ4RoN2ySL-YK_hCqp2C4Wzmg=s96-c'}
+                        user:{
+                            name: 'Medusa Collins',
+                            email: 'collinsmedusa@gmail.com',
+                            imageUrl:'https://lh3.googleusercontent.com/a/ACg8ocJUsNIwm70oAlbkR3-J-XJ4RoN2ySL-YK_hCqp2C4Wzmg=s96-c',
+                            roles: ['Owner']}
                     },
                     {
                         message: 'Hello World', 
-                        user:{name: 'Medusa Collins',email: 'collinsmedusa@gmail.com',imageUrl:'https://lh3.googleusercontent.com/a/ACg8ocJUsNIwm70oAlbkR3-J-XJ4RoN2ySL-YK_hCqp2C4Wzmg=s96-c'}
+                        user:{
+                            name: 'Medusa Collins',
+                            email: 'collinsmedusa@gmail.com',
+                            imageUrl:'https://lh3.googleusercontent.com/a/ACg8ocJUsNIwm70oAlbkR3-J-XJ4RoN2ySL-YK_hCqp2C4Wzmg=s96-c',
+                            roles: ['Owner']}
                     }
                 ]
         },
@@ -27,7 +35,11 @@ const data = [
                 [
                     {
                         message: 'Hello Worldaa', 
-                        user:{name: 'Medusa Collinss',email: 'collinsmedusa@gmail.com',imageUrl:'https://lh3.googleusercontent.com/a/ACg8ocJUsNIwm70oAlbkR3-J-XJ4RoN2ySL-YK_hCqp2C4Wzmg=s96-c'}
+                        user:{
+                            name: 'Medusa Collins',
+                            email: 'collinsmedusa@gmail.com',
+                            imageUrl:'https://lh3.googleusercontent.com/a/ACg8ocJUsNIwm70oAlbkR3-J-XJ4RoN2ySL-YK_hCqp2C4Wzmg=s96-c',
+                            roles: ['Owner']}
                     }
                 ]
         }
@@ -38,13 +50,8 @@ const data = [
             email: 'collinsmedusa@gmail.com',
             imageUrl:'https://lh3.googleusercontent.com/a/ACg8ocJUsNIwm70oAlbkR3-J-XJ4RoN2ySL-YK_hCqp2C4Wzmg=s96-c',
             roles: ['Owner']
-        },
-        {
-            name: 'Medusa Collins',
-            email: 'collinsmedusa@gmail.com',
-            imageUrl:'https://lh3.googleusercontent.com/a/ACg8ocJUsNIwm70oAlbkR3-J-XJ4RoN2ySL-YK_hCqp2C4Wzmg=s96-c',
-            roles: ['Owner']
         }
+
     ],
     serverRoles: [
         {
