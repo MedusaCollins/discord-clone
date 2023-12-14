@@ -8,7 +8,7 @@ import Users from "./components/Users";
 export default function Home(params) {
     const [selected, setSelected] = useState({
         server: null,
-        channel: null
+        channel: 0
     });
     const user= params.user;
 
@@ -20,7 +20,7 @@ export default function Home(params) {
         <div className="flex">
             <ServerSelect selected={selected} setSelected={setSelected} user={user}/>
             <Channels selected={selected} setSelected={setSelected} user={user}/>
-            <ChatBox />
+            <ChatBox selected={selected} user={user}/>
             <Users/>
         </div>
     )

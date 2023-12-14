@@ -6,7 +6,6 @@ import { faAngleDown, faHashtag, faVolumeHigh } from '@fortawesome/free-solid-sv
 
 const Channels = (params) => {
   const {selected, setSelected, user} = params
-  console.log(user)
 
   return (
     <div className="w-[10%] h-screen bg-black-200 text-white flex flex-col relative justify-between">
@@ -18,7 +17,8 @@ const Channels = (params) => {
 
           {data[selected.server].channels.map((channel,index) => (
             <div key={index} onClick={() => (selected.channel!==index ? setSelected({...selected, channel:index}) : null)} 
-                className='flex items-center h-7 mx-2 my-1 px-2 cursor-pointer hover:bg-black-hover rounded-lg transition-all'>
+                className={`flex items-center h-7 mx-2 my-1 px-2 cursor-pointer hover:bg-black-hover rounded-lg transition-all
+                ${selected.channel===index ? 'bg-black-hover' :''}`}>
 
               <p className='text-sm flex gap-5 items-center'>
                 {channel.type==='text' ? <FontAwesomeIcon icon={faHashtag} className='mx-0.5'/> :
