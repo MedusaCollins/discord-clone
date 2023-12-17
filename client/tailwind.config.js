@@ -3,6 +3,9 @@ module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}",],
   theme: {
     extend: {
+      fontSize: {
+        'ssm': '10px',
+      },
       colors:{
         black: {
           focus: "#404249",
@@ -17,7 +20,7 @@ module.exports = {
           100: "#B5BAC1",
           200: "#80848E"
         },
-        blue: "#7289da"
+        blue: "#5865F2"
       }
     },
   },

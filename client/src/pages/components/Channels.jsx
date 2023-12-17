@@ -1,28 +1,30 @@
 import React from 'react'
-import data from './Data'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleDown, faHashtag, faVolumeHigh } from '@fortawesome/free-solid-svg-icons'
 
 const Channels = (params) => {
-  const {selected, setSelected, user} = params
+  const {selected, selectedServer, setSelected, user} = params
+
+  console.log(selectedServer.channels)
+  console.log(selected.channelID)
 
   return (
     <div className="w-[10%] h-screen bg-black-200 text-white flex flex-col relative justify-between">
-      {selected.server != null &&
+      {selectedServer.channels != null &&
         <div>
-        <p className='justify-between flex p-2 hover:bg-black-hover cursor-pointer transition-all'>{data[selected.server].name} 
-          <span><FontAwesomeIcon icon={faAngleDown} /></span>
-        </p>
+          <p className='justify-between items-center flex px-5 py-2 hover:bg-black-hover cursor-pointer transition-all'>{selectedServer.name} 
+            <span className='text-sm'><FontAwesomeIcon icon={faAngleDown} /></span>
+          </p>
 
-          {data[selected.server].channels.map((channel,index) => (
-            <div key={index} onClick={() => (selected.channel!==index ? setSelected({...selected, channel:index}) : null)} 
+          {selectedServer.channels.map((channel,index) => (
+            <div key={index} onClick={() => (selectedServer.channelID!==channel.channelID ? setSelected({...selected, channelID:channel._id}) : null)} 
                 className={`flex items-center h-7 mx-2 my-1 px-2 cursor-pointer rounded-md transition-all
-                ${selected.channel===index ? 'bg-black-focus' :'hover:bg-black-hover'}`}>
+                ${selectedServer.channelID===channel.channelID ? 'bg-black-focus' :'hover:bg-black-hover'}`}>
 
               <span className='text-sm text-[#80848E] flex gap-5 items-center'>
                 {channel.type==='text' ? <FontAwesomeIcon icon={faHashtag} className='mx-0.5'/> :
-                 <FontAwesomeIcon icon={faVolumeHigh} />} <span className={`${selected.channel===index ? 'text-white' :''}`} >{channel.name}</span>
+                 <FontAwesomeIcon icon={faVolumeHigh} />} <span className={`${selectedServer.channelID===channel.channelID ? 'text-white' :''}`} >{channel.name}</span>
               </span>
             </div>
           ))}
