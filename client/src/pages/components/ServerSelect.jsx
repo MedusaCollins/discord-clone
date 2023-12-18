@@ -10,7 +10,6 @@ const ServerSelect = (params) => {
     joinServer: false,
   });
   const [input, setInput] = useState(`${params.user.name}'s Server`)
-
   async function createServer(event) {
     event.preventDefault();
     try {
@@ -25,8 +24,8 @@ const ServerSelect = (params) => {
   return (
     <div className="w-[3%] h-screen bg-black-400 py-5">
       <div className='space-y-3'>
-        <div className='flex relative group cursor-pointer' onClick={() => (params.selected._id!==null ? params.setSelected({...params.selected, serverID:null}) : null)}>
-            <div className={`w-[0.200rem] ${params.selected._id===null ? 'h-10 scale-100' :'h-5 my-2.5'} rounded-r-xl bg-white scale-0 group-hover:scale-100 absolute transition-all duration-300`}></div>
+        <div className='flex relative group cursor-pointer' onClick={() => (params.selected.serverID!==null ? params.setSelected({...params.selected, serverID:null}) : null)}>
+            <div className={`w-[0.200rem] ${params.selected.serverID===null ? 'h-10 scale-100' :'h-5 my-2.5'} rounded-r-xl bg-white scale-0 group-hover:scale-100 absolute transition-all duration-300`}></div>
             <div className='flex mx-auto items-center justify-center'>
               <img src={process.env.REACT_APP_IMG} alt='server' className={`w-10 h-10 group-hover:rounded-xl ${params.selected._id===null ? 'rounded-xl': 'rounded-3xl'} bg-black-200 transition-all duration-300`}/>
             </div>

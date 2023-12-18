@@ -169,7 +169,7 @@ app.post("/getServer", async (req, res) => {
   // console.log(req.body)
   try {
     const server = await Serverdb.findById(req.body.serverID);
-    console.log(server + "server")
+    console.log(server)
     res.send(server);
   } catch (error) {
     console.error("Login error:", error);

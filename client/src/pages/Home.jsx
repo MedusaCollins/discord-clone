@@ -10,17 +10,16 @@ import axios from "axios";
 export default function Home(params) {
     const [selected, setSelected] = useState({
         serverID: null,
-        channelID: "01",
+        channelID: null,
     });
     const [server, setServer] = useState([{}]);
     const user= params.user;
-
     const [data, setData] = useState([])
     useEffect(() => {
         axios.post(`${process.env.REACT_APP_SERVER}/listServers`, { user: params.user })
           .then(res => {
             setData(res.data);
-            console.log(res.data[0]._id)
+            console.log(res.data)
           }).catch(err => {
             console.log(err);
           });
@@ -37,10 +36,10 @@ export default function Home(params) {
 
     return(
         <div className="flex">
-            <ServerSelect selected={server} setSelected={setSelected} user={user} data={data} setData={setData}/>
-            <Channels selected={selected} selectedServer={server} user={user}/>
-            {/* <ChatBox selected={selected} user={user}/> */}
-            {/* <Users selected={selected} user={user}/> */}
+            <ServerSelect selected={selected} setSelected={setSelected} user={user} data={data} setData={setData}/>
+            <Channels selected={selected} setSelected={setSelected} selectedServer={server} user={user}/>
+            <ChatBox selected={selected} selectedServer={server} user={user}/>
+            <Users selected={selected} selectedServer={server}/>
         </div>
     )
 }

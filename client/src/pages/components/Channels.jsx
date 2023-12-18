@@ -5,10 +5,6 @@ import { faAngleDown, faHashtag, faVolumeHigh } from '@fortawesome/free-solid-sv
 
 const Channels = (params) => {
   const {selected, selectedServer, setSelected, user} = params
-
-  console.log(selectedServer.channels)
-  console.log(selected.channelID)
-
   return (
     <div className="w-[10%] h-screen bg-black-200 text-white flex flex-col relative justify-between">
       {selectedServer.channels != null &&
@@ -18,13 +14,13 @@ const Channels = (params) => {
           </p>
 
           {selectedServer.channels.map((channel,index) => (
-            <div key={index} onClick={() => (selectedServer.channelID!==channel.channelID ? setSelected({...selected, channelID:channel._id}) : null)} 
-                className={`flex items-center h-7 mx-2 my-1 px-2 cursor-pointer rounded-md transition-all
-                ${selectedServer.channelID===channel.channelID ? 'bg-black-focus' :'hover:bg-black-hover'}`}>
+            <div key={index} onClick={() => (selected.channelID!==channel._id ? setSelected({...selected, channelID:channel._id}) : null)} 
+            className={`flex items-center h-7 mx-2 my-1 px-2 cursor-pointer rounded-md transition-all
+            ${selected.channelID===channel._id ? 'bg-black-focus' :'hover:bg-black-hover'}`}>
 
               <span className='text-sm text-[#80848E] flex gap-5 items-center'>
                 {channel.type==='text' ? <FontAwesomeIcon icon={faHashtag} className='mx-0.5'/> :
-                 <FontAwesomeIcon icon={faVolumeHigh} />} <span className={`${selectedServer.channelID===channel.channelID ? 'text-white' :''}`} >{channel.name}</span>
+                 <FontAwesomeIcon icon={faVolumeHigh} />} <span className={`${selected.channelID===channel._id ? 'text-white' :''}`} >{channel.name}</span>
               </span>
             </div>
           ))}
