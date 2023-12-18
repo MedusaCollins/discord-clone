@@ -28,6 +28,8 @@ export default function Home(params) {
       useEffect(() => {
         axios.post(`${process.env.REACT_APP_SERVER}/getServer`, { serverID: selected.serverID}).then(res => {
             setServer(res.data);
+        }).then(x => {
+            console.log(server)
         })
     }
     , [selected]);

@@ -1,24 +1,124 @@
 import React, {useState} from 'react'
 import axios from 'axios'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlus } from '@fortawesome/free-solid-svg-icons'
+import { faPlus, faChevronRight} from '@fortawesome/free-solid-svg-icons'
 
 const ServerSelect = (params) => {
   const [data, setData] = [params.data, params.setData]
   const [popup, setPopup] = useState({
     createServer: false,
     joinServer: false,
+    section: 1
   });
-  const [input, setInput] = useState(`${params.user.name}'s Server`)
+  const [input, setInput] = useState({
+    createServer: `${params.user.name}'s Server`,
+    joinServer: '',
+  })
   async function createServer(event) {
     event.preventDefault();
     try {
-      const res = await axios.post(`${process.env.REACT_APP_SERVER}/createServer`, { serverName: input, user: params.user });
+      const res = await axios.post(`${process.env.REACT_APP_SERVER}/createServer`, { serverName: input.createServer, user: params.user });
       setData([...data, res.data]);
       setInput('');
-      setPopup({...popup, createServer: false});
+      setPopup({...popup,joinServer: false, createServer:false, section: 1});
     } catch (err) {
       console.log(err);
+    }
+  }
+
+  async function joinServer(event) {
+    event.preventDefault();
+    try {
+      const res = await axios.post(`${process.env.REACT_APP_SERVER}/joinServer`, { serverID: input.joinServer, user: params.user });
+      console.log(res.data)
+      setData([...data, res.data]);
+      setInput('');
+      setPopup({...popup, joinServer: false, createServer:false, section: 1});
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  function popupSection(){
+    if(popup.section === 1){
+      return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#000000] bg-opacity-60" onClick={() => setPopup({...popup, createServer: false})}>
+          <div className="relative bg-[#313338] rounded-xl shadow-md mx-5" onClick={(e) => e.stopPropagation()}>
+            <div className="text-center sm:w-96">
+                <div className='p-4'>
+                  <p className='text-2xl text-white font-semibold'>Create a server</p>
+                  <p className='text-sm text-gray-200 mb-2'>Your server is where you and your friend hang out. Make yours and start talking.</p>
+                  <div className='text-left space-y-2'>
+                    <button onClick={()=> setPopup({...popup, section:3})} className="border rounded-md border-[#4E5058] hover:bg-[#3a3c41] p-2 pr-4 text-white flex items-center w-full">
+                      <img className="w-16 -ml-2" src={process.env.REACT_APP_IMG} alt="test" />Create My Own
+                      <FontAwesomeIcon icon={faChevronRight} className='ml-auto text-gray-200'/>
+                    </button>
+                    <button onClick={()=> setPopup({...popup, section:2})} className="border rounded-md border-[#4E5058] hover:bg-[#3a3c41] p-2 pr-4 text-white flex items-center w-full">
+                      <img className="w-16 -ml-2" src={process.env.REACT_APP_IMG} alt="test" />Join A Server
+                      <FontAwesomeIcon icon={faChevronRight} className='ml-auto text-gray-200'/>
+                    </button>
+                  </div>
+                </div>
+            </div>
+          </div>
+        </div>
+      );
+    }else if(popup.section === 2){
+      return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#000000] bg-opacity-60" onClick={() => setPopup({...popup, createServer: false, section:1})}>
+          <div className="relative bg-[#313338] rounded-xl shadow-md mx-5" onClick={(e) => e.stopPropagation()}>
+            <div className="text-center sm:w-96">
+              <form onSubmit={joinServer}>
+                <div className='p-4'>
+                  <p className='text-2xl text-white font-semibold'>Join a Server</p>
+                  <p className='text-sm text-gray-200 mb-2'>Enter an invite link below to join an existing server</p>
+                  <div className='flex flex-col text-left'>
+                    <label htmlFor="invite link" className="block text-ssm font-bold leading-6 text-gray-100">
+                      INVITE LINK <span className='text-red-500'>*</span>
+                    </label>
+                    <div className="my-2">
+                      <input value={input.joinServer} onChange={(e) => setInput({...input, joinServer:e.target.value})} type="text" required
+                      className="w-full px-2 py-2 text-sm rounded-sm bg-[#1E1F22] text-gray-300 border-0 ring-0 outline-none resize-none" />
+                    </div>
+                  </div>
+                </div>
+                <div className='justify-between flex p-4 rounded-b-xl bg-black-200'>
+                  <button onClick={()=> setPopup({...popup, section:1})} className='text-white text-ssm'>Back</button>
+                  <button className='text-white text-ssm px-5 py-2 rounded-sm bg-blue-50 '>Join</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      );
+    } else if(popup.section === 3){
+      return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#000000] bg-opacity-60" onClick={() => setPopup({...popup, createServer: false, section:1})}>
+          <div className="relative bg-[#313338] rounded-xl shadow-md mx-5" onClick={(e) => e.stopPropagation()}>
+            <div className="text-center sm:w-96">
+              <form onSubmit={createServer}>
+                <div className='p-4'>
+                  <p className='text-2xl text-white font-semibold'>Customize your server</p>
+                  <p className='text-sm text-gray-200 mb-2'>Give your new server a personality with a name and an icon. You can always change it later.</p>
+                  <div className='flex flex-col text-left'>
+                    <label htmlFor="Server name" className="block text-ssm font-bold leading-6 text-gray-100">
+                      SERVER NAME
+                    </label>
+                    <div className="my-2">
+                      <input value={input.createServer} onChange={(e) => setInput({...input, createServer:e.target.value})} type="text" required
+                      className="w-full px-2 py-2 text-sm rounded-sm bg-[#1E1F22] text-gray-300 border-0 ring-0 outline-none resize-none" />
+                    </div>
+                  </div>
+                </div>
+                <div className='justify-between flex p-4 rounded-b-xl bg-black-200'>
+                  <button onClick={()=> setPopup({...popup, section:1})} className='text-white text-ssm'>Back</button>
+                  <button className='text-white text-ssm px-5 py-2 rounded-sm bg-blue-50 '>Create</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      );
     }
   }
   return (
@@ -46,33 +146,8 @@ const ServerSelect = (params) => {
           </div>
         </div>
       </div>
-      {popup.createServer ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#000000] bg-opacity-60" onClick={() => setPopup({...popup, createServer: false})}>
-          <div className="relative bg-[#313338] rounded-xl shadow-md mx-5" onClick={(e) => e.stopPropagation()}>
-            <div className="text-center sm:w-96">
-              <form onSubmit={createServer}>
-                <div className='p-4'>
-                  <p className='text-2xl text-white font-semibold'>Customize your server</p>
-                  <p className='text-sm text-gray-200 mb-2'>Give your new server a personality with a name and an icon. You can always change it later.</p>
-                  <div className='flex flex-col text-left'>
-                    <label htmlFor="Server name" className="block text-ssm font-bold leading-6 text-gray-100">
-                      SERVER NAME
-                    </label>
-                    <div className="my-2">
-                      <input value={input} onChange={(e) => setInput(e.target.value)} type="text" required
-                      className="w-full px-2 py-2 text-sm rounded-sm bg-[#1E1F22] text-gray-300 border-0 ring-0 outline-none resize-none" />
-                    </div>
-                  </div>
-                </div>
-                <div className='justify-between flex p-4 rounded-b-xl bg-black-200'>
-                  <button className='text-white text-ssm'>Back</button>
-                  <button className='text-white text-ssm px-5 py-2 rounded-sm bg-blue '>Create</button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-        ): null}
+      {popup.createServer ? popupSection() : null}
+        
     </div>
   )
 }

@@ -40,6 +40,29 @@ mongoose.connect(`${process.env.DB}`)
     console.error(`Mongodb connection error: ${err}`);
   });
 
+
+app.post("/joinServer", async (req, res) => {
+  const user = {
+    name: req.body.user.name,
+    email: req.body.user.email,
+    imageUrl: req.body.user.imageUrl,
+    roles: ["Owner"]
+  }
+  try {
+    const server = await Serverdb.findById(req.body.serverID);
+    server.serverUsers.push(user);
+    server.save()
+      .then((result) => {
+        console.log('Server document saved successfully:', result);
+      })
+      .catch((error) => {
+        console.error('Error saving Server document:', error);
+      });
+    res.send(server);
+  } catch (error) {
+    console.error("Login error:", error);
+  }
+});
 app.post("/createServer", async (req, res) => {
   const serverData = {
     serverID: '01',
