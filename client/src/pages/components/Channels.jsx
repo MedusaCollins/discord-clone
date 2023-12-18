@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faAngleDown, faHashtag, faVolumeHigh } from '@fortawesome/free-solid-svg-icons'
+import { faAngleDown, faHashtag, faVolumeHigh, faArrowRightFromBracket } from '@fortawesome/free-solid-svg-icons'
 
 const Channels = (params) => {
   const {selected, selectedServer, setSelected, user} = params
@@ -29,6 +29,7 @@ const Channels = (params) => {
       <div className='bg-black-300 absolute bottom-0 w-full h-10 flex items-center'>
         <img src={user.imageUrl} alt="" className='w-6 h-6 rounded-full mx-2'/>
         <p className='text-sm'>{user.name}</p>
+        <button onClick={()=> params.setLogin(false)} className='right-2 absolute'><FontAwesomeIcon icon={faArrowRightFromBracket} /></button>
       </div>
     </div>
   )
