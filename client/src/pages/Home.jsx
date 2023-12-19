@@ -37,7 +37,7 @@ export default function Home(params) {
         <div className="flex">
             <ServerSelect selected={selected} setSelected={setSelected} user={user} data={data} setData={setData}/>
             <Channels selected={selected} setSelected={setSelected} setData={setData} selectedServer={server} user={user} setLogin={params.setLogin}/>
-            <ChatBox selected={selected} selectedServer={server} user={user}/>
+            <ChatBox selected={selected} selectedServer={server} setServer={setServer} user={user}/>
             <Users selected={selected} selectedServer={server}/>
         </div>
     )

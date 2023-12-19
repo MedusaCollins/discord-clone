@@ -4,7 +4,7 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons'
 import { io } from "socket.io-client";
 
 const ChatBox = (params) => {
-  const { selected, selectedServer } = params
+  const { selected, selectedServer, setServer } = params
   const [selectedChannel, setSelectedChannel] = useState(null)
 
   useEffect(() => {
@@ -21,8 +21,8 @@ const ChatBox = (params) => {
   useEffect(() => {
     const socket = io(process.env.REACT_APP_SERVER);
     setSocket(socket);
-    socket.on("message", (data) => {
-      setMessages((messages) => [...messages, data]);
+    socket.on("getMessage", (data) => {
+      setServer(data.server)
     });
     return () => {
       socket.disconnect();
