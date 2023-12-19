@@ -19,7 +19,6 @@ export default function Home(params) {
         axios.post(`${process.env.REACT_APP_SERVER}/listServers`, { user: params.user })
           .then(res => {
             setData(res.data);
-            console.log(res.data)
           }).catch(err => {
             console.log(err);
           });
@@ -28,8 +27,6 @@ export default function Home(params) {
       useEffect(() => {
         axios.post(`${process.env.REACT_APP_SERVER}/getServer`, { serverID: selected.serverID}).then(res => {
             setServer(res.data);
-        }).then(x => {
-            console.log(server)
         })
     }
     , [selected]);
@@ -39,7 +36,7 @@ export default function Home(params) {
     return(
         <div className="flex">
             <ServerSelect selected={selected} setSelected={setSelected} user={user} data={data} setData={setData}/>
-            <Channels selected={selected} setSelected={setSelected} selectedServer={server} user={user} setLogin={params.setLogin}/>
+            <Channels selected={selected} setSelected={setSelected} setData={setData} selectedServer={server} user={user} setLogin={params.setLogin}/>
             <ChatBox selected={selected} selectedServer={server} user={user}/>
             <Users selected={selected} selectedServer={server}/>
         </div>

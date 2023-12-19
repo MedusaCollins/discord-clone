@@ -1,10 +1,11 @@
 import React from 'react'
+import axios from 'axios'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleDown, faHashtag, faVolumeHigh, faArrowRightFromBracket, faX, faGear, faUserPlus } from '@fortawesome/free-solid-svg-icons'
 
 const Channels = (params) => {
-  const {selected, selectedServer, setSelected, user} = params
+  const {selected, selectedServer, setSelected,setData, user} = params
   const [popup, setPopup] = React.useState({
     serverInfo: false,
     invite: false,
@@ -16,6 +17,16 @@ const Channels = (params) => {
     navigator.clipboard.writeText(selectedServer._id)
     setText('Copied')
     setTimeout(() => setText('Copy'), 1000)
+  }
+  async function leaveServer(){
+    selectedServer.serverUsers.map(selectedUser=> {
+      if (selectedUser.email === user.email){
+        axios.post(`${process.env.REACT_APP_SERVER}/leaveServer`, {serverID: selectedServer._id, user: selectedUser}).then(res => {
+          setData(res.data)
+          setSelected({serverID: null, channelID: null})
+        })
+      }
+    })
   }
   return (
     <div className="w-[10%] h-screen bg-black-200 text-white flex flex-col relative justify-between">
@@ -29,7 +40,7 @@ const Channels = (params) => {
               <ul className='p-2'>
                 <li className="hover:bg-blue cursor-pointer text-gray-100 hover:text-white p-1 px-2 text-sm justify-between flex items-center rounded-sm">Server Settings <FontAwesomeIcon icon={faGear} /></li>
                 <li onClick={()=> setPopup({...popup, invite:true})} className="hover:bg-blue-50 cursor-pointer text-blue-50 hover:text-white p-1 px-2 text-sm justify-between flex items-center rounded-sm">Invite People <FontAwesomeIcon icon={faUserPlus} /></li>
-                <li className="hover:bg-red-500 cursor-pointer text-red-500 hover:text-white p-1 px-2 text-sm justify-between flex items-center rounded-sm">Leave Server <FontAwesomeIcon icon={faArrowRightFromBracket} /></li>
+                <li onClick={()=> leaveServer()}className="hover:bg-red-500 cursor-pointer text-red-500 hover:text-white p-1 px-2 text-sm justify-between flex items-center rounded-sm">Leave Server <FontAwesomeIcon icon={faArrowRightFromBracket} /></li>
               </ul>
             </div>
           )}

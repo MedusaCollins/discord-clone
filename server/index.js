@@ -65,6 +65,21 @@ app.post("/joinServer", async (req, res) => {
     console.error("Login error:", error);
   }
 });
+
+app.post("/leaveServer", async (req, res) => {
+  try {
+    const server = await Serverdb.findOne({ 'serverUsers.email': req.body.user.email, '_id': req.body.serverID });
+    if(server){
+      await Serverdb.findByIdAndUpdate(req.body.serverID, { $pull: { serverUsers: req.body.user } }, { new: true });
+      const server = await Serverdb.find({ 'serverUsers.email': req.body.user.email});
+      res.send(server);
+    }else{
+      res.send({'Error': 'You are not in this server.'});
+    }
+  } catch (error) {
+    console.error("Login error:", error);
+  }
+});
 app.post("/createServer", async (req, res) => {
   const serverData = {
     serverID: '01',
