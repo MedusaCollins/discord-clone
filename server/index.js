@@ -49,16 +49,18 @@ app.post("/joinServer", async (req, res) => {
     roles: ["Owner"]
   }
   try {
-    const server = await Serverdb.findById(req.body.serverID);
-    server.serverUsers.push(user);
-    server.save()
-      .then((result) => {
-        console.log('Server document saved successfully:', result);
-      })
-      .catch((error) => {
-        console.error('Error saving Server document:', error);
-      });
-    res.send(server);
+    const server = await Serverdb.findOne({ 'serverUsers.email': req.body.user.email, '_id': req.body.serverID });
+    if(server){
+      res.send({'Error': 'You are already in this server.'});
+    }else{
+      const isServer = await Serverdb.findOne({ '_id': req.body.serverID });
+      if(isServer){
+        const server = await Serverdb.findByIdAndUpdate(req.body.serverID, { $push: { serverUsers: user } }, { new: true });
+        res.send(server)
+      }else{
+        res.send({'Error': 'This server does not exist.'});
+      }
+    }
   } catch (error) {
     console.error("Login error:", error);
   }
@@ -192,7 +194,6 @@ app.post("/getServer", async (req, res) => {
   // console.log(req.body)
   try {
     const server = await Serverdb.findById(req.body.serverID);
-    console.log(server)
     res.send(server);
   } catch (error) {
     console.error("Login error:", error);

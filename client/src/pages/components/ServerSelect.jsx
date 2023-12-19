@@ -13,9 +13,11 @@ const ServerSelect = (params) => {
   const [input, setInput] = useState({
     createServer: `${params.user.name}'s Server`,
     joinServer: '',
+    errorHandler: ''
   })
   async function createServer(event) {
     event.preventDefault();
+    setInput('');
     try {
       const res = await axios.post(`${process.env.REACT_APP_SERVER}/createServer`, { serverName: input.createServer, user: params.user });
       setData([...data, res.data]);
@@ -28,17 +30,22 @@ const ServerSelect = (params) => {
 
   async function joinServer(event) {
     event.preventDefault();
+    setInput('');
     try {
       const res = await axios.post(`${process.env.REACT_APP_SERVER}/joinServer`, { serverID: input.joinServer, user: params.user });
       console.log(res.data)
-      setData([...data, res.data]);
-      setInput('');
-      setPopup({...popup, joinServer: false, createServer:false, section: 1});
+      if(res.data.Error){
+        setInput({...input, errorHandler: res.data.Error})
+      }
+      else{
+        setData([...data, res.data]);
+        setInput('');
+        setPopup({...popup, joinServer: false, createServer:false, section: 1});
+      }
     } catch (err) {
       console.log(err);
     }
   }
-
   function popupSection(){
     if(popup.section === 1){
       return (
@@ -65,7 +72,10 @@ const ServerSelect = (params) => {
       );
     }else if(popup.section === 2){
       return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#000000] bg-opacity-60" onClick={() => setPopup({...popup, createServer: false, section:1})}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#000000] bg-opacity-60" onClick={() => {
+          setPopup({...popup, createServer: false, section:1});
+          setInput({...input, errorHandler: '', joinServer: ''});
+        }}>
           <div className="relative bg-[#313338] rounded-xl shadow-md mx-5" onClick={(e) => e.stopPropagation()}>
             <div className="text-center sm:w-96">
               <form onSubmit={joinServer}>
@@ -79,11 +89,12 @@ const ServerSelect = (params) => {
                     <div className="my-2">
                       <input value={input.joinServer} onChange={(e) => setInput({...input, joinServer:e.target.value})} type="text" required
                       className="w-full px-2 py-2 text-sm rounded-sm bg-[#1E1F22] text-gray-300 border-0 ring-0 outline-none resize-none" />
+                      <p className='text-sm text-red-500 right-5 mt-1 absolute'>{input.errorHandler}</p>
                     </div>
                   </div>
                 </div>
                 <div className='justify-between flex p-4 rounded-b-xl bg-black-200'>
-                  <button onClick={()=> setPopup({...popup, section:1})} className='text-white text-ssm'>Back</button>
+                  <button onClick={()=> {setPopup({...popup, section:1});setInput({...input, errorHandler: '', joinServer: ''});}} className='text-white text-ssm'>Back</button>
                   <button className='text-white text-ssm px-5 py-2 rounded-sm bg-blue-50 '>Join</button>
                 </div>
               </form>
