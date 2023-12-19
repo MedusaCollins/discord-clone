@@ -39,7 +39,7 @@ const ChatBox = (params) => {
         chatArea.scrollTop = chatArea.scrollHeight - chatArea.clientHeight;
       }
     }
-  }, [messages]);
+  }, [selectedChannel]);
 
   const sendMessage = (event) => {
     event.preventDefault();
@@ -51,10 +51,10 @@ const ChatBox = (params) => {
   };
 
   return (
-    <div className="w-[80%] h-screen text-sm flex  bg-black-100">
+    <div className="w-[80%] h-screen text-sm flex bg-black-100">
       {selectedChannel !== null && selectedChannel !== undefined && selectedServer !== undefined && selectedServer.channels != null? (
-        <div className='flex flex-col justify-between w-full'>
-          <ul ref={chatAreaRef}>
+        <div className='flex flex-col justify-between relative w-full'>
+          <ul ref={chatAreaRef} className='overflow-auto'>
             {selectedChannel.messages.map((msg, index) => (
               <div key={index} className='flex space-x-5 m-5 p-2 rounded-xl items-center hover:bg-black-200'>
                 <img src={msg.user.imageUrl} alt="" className='w-8 h-8 rounded-full' />
@@ -65,11 +65,10 @@ const ChatBox = (params) => {
               </div>
             ))}
           </ul>
-
-          <form onSubmit={sendMessage} className='p-1 my-4 mx-3 bg-black-50 flex items-center justify-center rounded-lg'>
-            <button className='bg-gray-100 text-black-50 w-4 h-4 text-sm p-1 mx-2 flex items-center justify-center rounded-full'><FontAwesomeIcon icon={faPlus} /></button>
-            <input type="text" value={message} onChange={(event) => setMessage(event.target.value)} className=' bg-black-50 border-0 text-sm focus:ring-0 p-1 focus:outline-none overflow-auto w-full text-white truncate' placeholder={`${selectedChannel.name} kanalına mesaj gönder`} />
-          </form>
+            <form onSubmit={sendMessage} className='p-1 mb-4 mx-3 bg-black-50 flex items-center justify-center rounded-lg'>
+              <button className='bg-gray-100 text-black-50 w-4 h-4 text-sm p-1 mx-2 flex items-center justify-center rounded-full'><FontAwesomeIcon icon={faPlus} /></button>
+              <input type="text" value={message} onChange={(event) => setMessage(event.target.value)} className=' bg-black-50 border-0 text-sm focus:ring-0 p-1 focus:outline-none overflow-auto w-full text-white truncate' placeholder={`${selectedChannel.name} kanalına mesaj gönder`} />
+            </form>
         </div>
       ) : <div className='flex flex-col justify-center items-center w-full h-full'></div>}
     </div>
