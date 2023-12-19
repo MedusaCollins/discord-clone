@@ -1,5 +1,7 @@
-import React, {useState} from 'react'
-import axios from 'axios'
+import React, {useEffect, useState} from 'react'
+import axios from 'axios';
+import { io } from "socket.io-client";
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus, faChevronRight} from '@fortawesome/free-solid-svg-icons'
 
@@ -15,6 +17,12 @@ const ServerSelect = (params) => {
     joinServer: '',
     errorHandler: ''
   })
+  const [socket, setSocket] = useState(null);
+  useEffect(() => {
+    const socket = io(process.env.REACT_APP_SERVER);
+    setSocket(socket);
+  }, []);
+
   async function createServer(event) {
     event.preventDefault();
     setInput('');
@@ -38,6 +46,7 @@ const ServerSelect = (params) => {
         setInput({...input, errorHandler: res.data.Error})
       }
       else{
+        socket.emit('joinServer', {serverID: input.joinServer})
         setData([...data, res.data]);
         setInput('');
         setPopup({...popup, joinServer: false, createServer:false, section: 1});

@@ -206,7 +206,6 @@ app.post("/listServers", async (req, res) => {
   }
 });
 app.post("/getServer", async (req, res) => {
-  // console.log(req.body)
   try {
     const server = await Serverdb.findById(req.body.serverID);
     res.send(server);
@@ -232,7 +231,12 @@ io.on("connection", (socket) => {
         console.error("Error finding server:", error);
       }
     });
-  
+    socket.on("joinServer", async (server) => {
+      io.emit("joinServer", {serverID: server.serverID});
+    })
+    socket.on("leaveServer", async (server) => {
+      io.emit("leaveServer", {serverID: server.serverID});
+    })
   } catch (error) {
     console.error("Login error:", error);
   }

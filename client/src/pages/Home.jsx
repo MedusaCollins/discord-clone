@@ -6,6 +6,7 @@ import ChatBox from "./components/ChatBox";
 import Users from "./components/Users";
 
 import axios from "axios";
+import { io } from "socket.io-client";
 
 export default function Home(params) {
     const [selected, setSelected] = useState({
@@ -15,6 +16,29 @@ export default function Home(params) {
     const [server, setServer] = useState([{}]);
     const user= params.user;
     const [data, setData] = useState([])
+    const [socket, setSocket] = useState(null);
+
+    useEffect(() => {
+        const socket = io(process.env.REACT_APP_SERVER);
+        setSocket(socket);
+        socket.on("joinServer", (data) => {
+            if(data.serverID === selected.serverID){
+                axios.post(`${process.env.REACT_APP_SERVER}/getServer`, { serverID: selected.serverID}).then(res => {
+                    setServer(res.data);
+                })
+            }
+        })
+        socket.on("leaveServer", (data) => {
+            if(data.serverID === selected.serverID){
+                axios.post(`${process.env.REACT_APP_SERVER}/getServer`, { serverID: selected.serverID}).then(res => {
+                    setServer(res.data);
+                })
+            }
+        })
+        return () => {
+            socket.disconnect();
+        };
+    }, [selected]);
     useEffect(() => {
         axios.post(`${process.env.REACT_APP_SERVER}/listServers`, { user: params.user })
           .then(res => {

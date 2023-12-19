@@ -1,5 +1,6 @@
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 import axios from 'axios'
+import { io } from "socket.io-client";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleDown, faHashtag, faVolumeHigh, faArrowRightFromBracket, faX, faGear, faUserPlus } from '@fortawesome/free-solid-svg-icons'
@@ -13,6 +14,13 @@ const Channels = (params) => {
   })
   const [text, setText] = React.useState('Copy')
 
+  const [socket, setSocket] = useState(null);
+  useEffect(() => {
+    const socket = io(process.env.REACT_APP_SERVER);
+    setSocket(socket);
+  }, []);
+
+  
   function invite(){
     navigator.clipboard.writeText(selectedServer._id)
     setText('Copied')
@@ -24,6 +32,7 @@ const Channels = (params) => {
         axios.post(`${process.env.REACT_APP_SERVER}/leaveServer`, {serverID: selectedServer._id, user: selectedUser}).then(res => {
           setData(res.data)
           setSelected({serverID: null, channelID: null})
+          socket.emit('leaveServer', {serverID: selectedServer._id})
         })
       }
     })
