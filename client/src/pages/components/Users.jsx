@@ -14,7 +14,7 @@ const Users = (params) => {
             <span className='mx-5 text-gray-200'>{roles.name} - {getRoleCount(roles.name)}</span>
             {selectedServer.serverUsers.map((user, index) => (
               user.roles[0] === roles.name ? (
-                  <div key={index} className="flex items-center justify-center h-10 mx-2 rounded-md cursor-pointer bg-black-200 hover:bg-black-300">
+                  <div key={index} className="flex items-center h-10 mt-1 pl-3 mx-2 rounded-md cursor-pointer bg-black-200 hover:bg-black-300">
                     <img className="w-7 h-7 rounded-full" src={user.imageUrl} alt="user" />
                     <p className="ml-2 text-sm" style={{ color: `${roles.color}` }}>{user.name}</p>
                   </div>

@@ -13,6 +13,13 @@ export default function Home(params) {
         serverID: null,
         channelID: null,
     });
+    const [popup, setPopup] = useState({
+        serverInfo: false,
+        serverSettings: false,
+        invite: false,
+        leave: false
+      })
+
     const [server, setServer] = useState([{}]);
     const user= params.user;
     const [data, setData] = useState([])
@@ -51,6 +58,7 @@ export default function Home(params) {
       useEffect(() => {
         axios.post(`${process.env.REACT_APP_SERVER}/getServer`, { serverID: selected.serverID}).then(res => {
             setServer(res.data);
+            setPopup({...popup, serverInfo:false})
         })
     }
     , [selected]);
@@ -60,7 +68,7 @@ export default function Home(params) {
     return(
         <div className="flex">
             <ServerSelect selected={selected} setSelected={setSelected} user={user} data={data} setData={setData}/>
-            <Channels selected={selected} setSelected={setSelected} setData={setData} selectedServer={server} user={user} setLogin={params.setLogin}/>
+            <Channels selected={selected} setSelected={setSelected} setData={setData} selectedServer={server} user={user} setLogin={params.setLogin} popup={popup} setPopup={setPopup}/>
             <ChatBox selected={selected} selectedServer={server} setServer={setServer} user={user}/>
             <Users selected={selected} selectedServer={server}/>
         </div>

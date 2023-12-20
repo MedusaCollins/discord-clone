@@ -4,23 +4,26 @@ import { io } from "socket.io-client";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleDown, faHashtag, faVolumeHigh, faArrowRightFromBracket, faX, faGear, faUserPlus } from '@fortawesome/free-solid-svg-icons'
+import { faCircleXmark } from '@fortawesome/free-regular-svg-icons'
 
 const Channels = (params) => {
-  const {selected, selectedServer, setSelected,setData, user} = params
-  const [popup, setPopup] = React.useState({
-    serverInfo: false,
-    invite: false,
-    leave: false
-  })
+  const {selected, selectedServer, setSelected,setData, user, popup, setPopup} = params
   const [text, setText] = React.useState('Copy')
+  const [selectedChannel, setSelectedChannel] = useState(selected.channelID)
 
   const [socket, setSocket] = useState(null);
   useEffect(() => {
     const socket = io(process.env.REACT_APP_SERVER);
     setSocket(socket);
   }, []);
-
   
+  const [input, setInput] = useState({
+    serverName: selectedServer.name,
+  })
+  useEffect(() => {
+    setInput({...input, serverName: selectedServer.name})
+  }, [selectedServer])
+
   function invite(){
     navigator.clipboard.writeText(selectedServer._id)
     setText('Copied')
@@ -37,6 +40,83 @@ const Channels = (params) => {
       }
     })
   }
+
+  const [currentStep, setCurrentStep] = useState(0);
+  const steps = [
+    "Overview",
+    "Members",
+    "Roles",
+    "Emoji",
+    "Logs",
+    "Bans",
+    "Custom Invite Link"
+  ];
+
+  const showSettingsMenu = () => {
+    switch (steps[currentStep]) {
+      case "Overview":
+        return (
+        <div className='w-[500px]'>
+          <p className='mb-2'>Server Overview</p>
+          <div className='divide-y divide-[#46484b] space-y-6'>
+            <div className='grid grid-cols-2 space-x-3'>
+              <div className='grid grid-cols-3 space-x-5'>
+                <img src={selectedServer.image} alt='server' className='rounded-full w-20'/>
+                <div className='col-span-2 space-y-3'>
+                <p className='text-ssm text-gray-100'>We recommend an image of at least 512x512 for the server.</p>
+                <button className='text-ssm border border-[#46484b] rounded-sm px-2 py-1.5'>Upload Image</button>
+                </div>
+              </div>
+
+              <div className='-mt-2'>
+                <label htmlFor="invite link" className="block text-ssm font-bold leading-6 text-gray-100">
+                  SERVER NAME
+                </label>
+                <input value={input.serverName} type="text" onChange={(e) => setInput({...input, serverName:e.target.value})}
+                className="w-full px-2 py-2 text-sm rounded-sm bg-[#1E1F22] text-gray-300 border-0 ring-0 outline-none resize-none" />
+              </div>
+            </div>
+            <div className='pt-5'>
+                <label htmlFor="invite link" className="block text-ssm font-bold leading-6 text-gray-100">
+                  SYSTEM MESSAGES CHANNEL
+                </label>
+                <div className="relative">
+                  <select
+                    value={selectedChannel}
+                    onChange={(e) => setSelectedChannel(e.target.value)}
+                    className="w-full px-2 py-2 text-sm rounded-sm bg-[#1E1F22] text-gray-300 border-0 ring-0 outline-none"
+                  >
+                    {selectedServer.channels.map((channel) => (
+                      <option key={channel.id} value={channel.id}>
+                        {channel.name}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                    <FontAwesomeIcon icon={faAngleDown} className="text-gray-400" />
+                  </div>
+                </div>
+              </div>
+          </div>
+        </div>)
+      case "Members":
+        return <p>Members</p>
+      case "Roles":
+        return <p>Roles</p>
+      case "Emoji":
+        return <p>Emoji</p>
+      case "Logs":
+        return <p>Logs</p>
+      case "Bans":
+        return <p>Bans</p>
+      case "Custom Invite Link":
+        return <p>Custom Invite Link</p>
+      default:
+        return true;
+    }
+  };
+
+
   return (
     <div className="w-[10%] h-screen bg-black-200 text-white flex flex-col relative justify-between">
       {selectedServer.channels != null &&
@@ -47,9 +127,9 @@ const Channels = (params) => {
           {popup.serverInfo && (
             <div className='bg-black-400 absolute w-[90%] m-2 rounded-md'>
               <ul className='p-2'>
-                <li className="hover:bg-blue cursor-pointer text-gray-100 hover:text-white p-1 px-2 text-sm justify-between flex items-center rounded-sm">Server Settings <FontAwesomeIcon icon={faGear} /></li>
+                <li onClick={()=> setPopup({...popup, serverSettings:true, serverInfo:false})} className="hover:bg-blue cursor-pointer text-gray-100 hover:text-white hover:bg-blue-50 p-1 px-2 text-sm justify-between flex items-center rounded-sm">Server Settings <FontAwesomeIcon icon={faGear} /></li>
                 <li onClick={()=> setPopup({...popup, invite:true})} className="hover:bg-blue-50 cursor-pointer text-blue-50 hover:text-white p-1 px-2 text-sm justify-between flex items-center rounded-sm">Invite People <FontAwesomeIcon icon={faUserPlus} /></li>
-                <li onClick={()=> leaveServer()}className="hover:bg-red-500 cursor-pointer text-red-500 hover:text-white p-1 px-2 text-sm justify-between flex items-center rounded-sm">Leave Server <FontAwesomeIcon icon={faArrowRightFromBracket} /></li>
+                <li onClick={()=> leaveServer()} className="hover:bg-red-500 cursor-pointer text-red-500 hover:text-white p-1 px-2 text-sm justify-between flex items-center rounded-sm">Leave Server <FontAwesomeIcon icon={faArrowRightFromBracket} /></li>
               </ul>
             </div>
           )}
@@ -90,6 +170,30 @@ const Channels = (params) => {
               </div>
           </div>
         </div>
+      </div> 
+      )}
+      {popup.serverSettings && (
+      <div className="fixed inset-0 z-50 flex bg-[#313338]">
+        <div className='bg-[#2B2D31] w-[38.4%] items-end px-2 text-left flex flex-col divide-y divide-[#46484b] space-y-3'>
+            <ul className='w-40 text-sm text-gray-100 pt-5'>
+              <p className='flex p-1 text-ssm font-bold'>{selectedServer.name}</p>
+              <li onClick={()=> setCurrentStep(0)} className='p-1 hover:bg-black-50 cursor-pointer rounded-md'>Overview</li>
+              <li onClick={()=> setCurrentStep(1)} className='p-1 hover:bg-black-50 cursor-pointer rounded-md'>Members</li>
+              <li onClick={()=> setCurrentStep(2)} className='p-1 hover:bg-black-50 cursor-pointer rounded-md'>Roles</li>
+              <li onClick={()=> setCurrentStep(3)} className='p-1 hover:bg-black-50 cursor-pointer rounded-md'>Emoji</li>
+            </ul>
+            
+            <ul className='w-40 text-sm text-gray-100'>
+              <p className='flex p-1 text-ssm font-bold'>MODERATION</p>
+              <li onClick={()=> setCurrentStep(4)} className='p-1 hover:bg-black-50 cursor-pointer rounded-md'>Logs</li>
+              <li onClick={()=> setCurrentStep(5)} className='p-1 hover:bg-black-50 cursor-pointer rounded-md'>Bans</li>
+              <li onClick={()=> setCurrentStep(6)} className='p-1 hover:bg-black-50 cursor-pointer rounded-md'>Custom Invite Link</li>
+            </ul>
+        </div>        
+        <div className='flex pt-5 ml-8 space-x-8'>
+              {showSettingsMenu()}
+            <button className="text-3xl text-gray-200 hover:text-gray-100 h-0" onClick={()=> setPopup({...popup, serverSettings: false})}><FontAwesomeIcon icon={faCircleXmark} /></button>
+        </div>        
       </div> 
       )}
     </div>
