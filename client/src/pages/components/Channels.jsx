@@ -3,7 +3,7 @@ import axios from 'axios'
 import { io } from "socket.io-client";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faAngleDown, faHashtag, faVolumeHigh, faArrowRightFromBracket, faX, faGear, faUserPlus } from '@fortawesome/free-solid-svg-icons'
+import { faAngleDown, faHashtag, faVolumeHigh, faArrowRightFromBracket, faX, faGear, faUser ,faUserPlus, faChevronRight, faUserGroup, faMagnifyingGlass, faShieldHalved, faEllipsis } from '@fortawesome/free-solid-svg-icons'
 import { faCircleXmark } from '@fortawesome/free-regular-svg-icons'
 
 const Channels = (params) => {
@@ -21,7 +21,7 @@ const Channels = (params) => {
     serverName: selectedServer.name,
   })
   useEffect(() => {
-    setInput({...input, serverName: selectedServer.name})
+    setInput({serverName: selectedServer.name})
   }, [selectedServer])
 
   function invite(){
@@ -29,22 +29,22 @@ const Channels = (params) => {
     setText('Copied')
     setTimeout(() => setText('Copy'), 1000)
   }
-  async function leaveServer(){
-    selectedServer.serverUsers.map(selectedUser=> {
-      if (selectedUser.email === user.email){
-        axios.post(`${process.env.REACT_APP_SERVER}/leaveServer`, {serverID: selectedServer._id, user: selectedUser}).then(res => {
-          setData(res.data)
-          setSelected({serverID: null, channelID: null})
-          socket.emit('leaveServer', {serverID: selectedServer._id})
-        })
+  async function leaveServer() {
+    selectedServer.serverUsers.map((selectedUser) => {
+      if (selectedUser.email === user.email) {
+        axios.post(`${process.env.REACT_APP_SERVER}/leaveServer`, { serverID: selectedServer._id, user: selectedUser }).then((res) => {
+          setData(res.data);
+          setSelected({ serverID: null, channelID: null });
+          socket.emit('leaveServer', { serverID: selectedServer._id });
+        });
       }
-    })
+      return null; // Add return statement
+    });
   }
 
   const [currentStep, setCurrentStep] = useState(0);
   const steps = [
     "Overview",
-    "Members",
     "Roles",
     "Emoji",
     "Logs",
@@ -57,7 +57,7 @@ const Channels = (params) => {
       case "Overview":
         return (
         <div className='w-[500px]'>
-          <p className='mb-2'>Server Overview</p>
+          <p className='mb-2 font-bold'>Server Overview</p>
           <div className='divide-y divide-[#46484b] space-y-6'>
             <div className='grid grid-cols-2 space-x-3'>
               <div className='grid grid-cols-3 space-x-5'>
@@ -82,27 +82,73 @@ const Channels = (params) => {
                 </label>
                 <div className="relative">
                   <select
-                    value={selectedChannel}
+                    value={selectedChannel || ""}
                     onChange={(e) => setSelectedChannel(e.target.value)}
                     className="w-full px-2 py-2 text-sm rounded-sm bg-[#1E1F22] text-gray-300 border-0 ring-0 outline-none"
                   >
-                    {selectedServer.channels.map((channel) => (
-                      <option key={channel.id} value={channel.id}>
+                    {selectedServer.channels.map((channel, index) => (
+                      <option key={index} value={channel.id}>
                         {channel.name}
                       </option>
                     ))}
                   </select>
-                  <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                  {/* <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
                     <FontAwesomeIcon icon={faAngleDown} className="text-gray-400" />
-                  </div>
+                  </div> */}
                 </div>
               </div>
           </div>
         </div>)
-      case "Members":
-        return <p>Members</p>
       case "Roles":
-        return <p>Roles</p>
+        return (
+          <div className='w-[500px] space-y-3'>
+            <p className='font-bold'>Roles</p>
+            <p className='text-ssm text-gray-100'>Use roles to group your server members and assign permissions.</p>
+
+            <button className='w-full bg-[#2B2D31] hover:bg-black-50 group rounded-md p-2 pr-5 items-center flex justify-between'>
+            <div className='col-span-3 space-x-3 flex'>
+              <div className='items-center flex'>
+                  <FontAwesomeIcon icon={faUserGroup} className='bg-black-100 text-gray-100 group-hover:text-white p-2 rounded-full items-center justify-center flex text-ssm' />
+              </div>
+              <div className="text-sm text-left">
+                <p className='text-gray-100 font-bold'>Default Permissions</p>
+                <p className='text-gray-200 text-ssm font-medium'>@everyone - applies to all server members</p>
+              </div>
+            </div>
+              <FontAwesomeIcon icon={faChevronRight} className='text-sm text-gray-100 font-thin col-span-1'/>
+            </button>
+
+            <div className='flex items-center space-x-2'>
+              <div className='items-center flex w-full'>
+                <input value={input.serverName} type="text" onChange={(e) => setInput({...input, serverName:e.target.value})}
+                  className="w-full px-2 py-2 text-sm rounded-l-sm bg-[#1E1F22] text-gray-300 border-0 ring-0 outline-none resize-none"/>
+                <FontAwesomeIcon icon={faMagnifyingGlass} className='text-gray-100 bg-[#1E1F22] py-2.5 px-2 rounded-r-sm'/>
+              </div>
+              <button className='bg-blue-50 hover:bg-blue-200 px-3 py-2 text-ssm w-24 rounded-sm'>Create Role</button>
+            </div>
+            <p className='text-ssm text-gray-100'>Members use the color of the highest role they have on this list. Drag roles to reorder them.</p>
+
+            <div>
+              <div className='grid grid-cols-2 w-full border-b border-[#46484b] pb-2'>
+                <p className='text-ssm font-bold text-gray-100'>ROLES - {selectedServer.serverRoles.length}</p>
+                <p className='text-ssm font-bold text-gray-100'>MEMBERS</p>
+              </div>
+              {selectedServer.serverRoles.map((role, index) => (
+                <div key={index} className='grid grid-cols-2 group w-full border-b border-[#46484b] hover:bg-black-50 py-2'>
+                  <div className='flex items-center mx-5 space-x-2'>
+                  <FontAwesomeIcon icon={faShieldHalved} style={{color: role.color}}/>
+                  <p className='text-ssm text-gray-100'>{role.name}</p>
+                  </div>
+                  <div className="text-gray-100 text-sm pl-5 flex items-center justify-between">
+                    <p>
+                    {selectedServer.serverUsers.filter((user) => user.roles[0] === role.name).length} <FontAwesomeIcon icon={faUser}/>
+                    </p>
+                    <button className="bg-black-200 group-hover:bg-black-400 transition-all px-2 py-1 mx-2 rounded-full"><FontAwesomeIcon icon={faEllipsis} /></button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>)
       case "Emoji":
         return <p>Emoji</p>
       case "Logs":
@@ -177,17 +223,17 @@ const Channels = (params) => {
         <div className='bg-[#2B2D31] w-[38.4%] items-end px-2 text-left flex flex-col divide-y divide-[#46484b] space-y-3'>
             <ul className='w-40 text-sm text-gray-100 pt-5'>
               <p className='flex p-1 text-ssm font-bold'>{selectedServer.name}</p>
-              <li onClick={()=> setCurrentStep(0)} className='p-1 hover:bg-black-50 cursor-pointer rounded-md'>Overview</li>
-              <li onClick={()=> setCurrentStep(1)} className='p-1 hover:bg-black-50 cursor-pointer rounded-md'>Members</li>
-              <li onClick={()=> setCurrentStep(2)} className='p-1 hover:bg-black-50 cursor-pointer rounded-md'>Roles</li>
-              <li onClick={()=> setCurrentStep(3)} className='p-1 hover:bg-black-50 cursor-pointer rounded-md'>Emoji</li>
-            </ul>
-            
-            <ul className='w-40 text-sm text-gray-100'>
-              <p className='flex p-1 text-ssm font-bold'>MODERATION</p>
-              <li onClick={()=> setCurrentStep(4)} className='p-1 hover:bg-black-50 cursor-pointer rounded-md'>Logs</li>
-              <li onClick={()=> setCurrentStep(5)} className='p-1 hover:bg-black-50 cursor-pointer rounded-md'>Bans</li>
-              <li onClick={()=> setCurrentStep(6)} className='p-1 hover:bg-black-50 cursor-pointer rounded-md'>Custom Invite Link</li>
+              {steps.map((step, index) => (
+                <div key={index}>
+                {index===3 && 
+                  <span>
+                    <div className='border-t border-[#46484b] my-2'></div>
+                    <p className='flex p-1 text-ssm font-bold'>MODERATION</p>
+                  </span>
+                }
+                <li key={index} onClick={()=> setCurrentStep(index)} className={`p-1 cursor-pointer rounded-md ${currentStep===index ? 'text-white bg-black-focus' :'hover:bg-black-hover'}`}>{step}</li>
+                </div>
+              ))}
             </ul>
         </div>        
         <div className='flex pt-5 ml-8 space-x-8'>
