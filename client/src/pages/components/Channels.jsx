@@ -150,7 +150,46 @@ const Channels = (params) => {
             </div>
           </div>)
       case "Emoji":
-        return <p>Emoji</p>
+        return (
+          <div className='w-[500px] space-y-3'>
+            <p className='font-bold'>Emoji</p>
+            <p className='text-ssm text-gray-100'>Add up to 50 custom emoji that anyone can use in this server.</p>
+
+            <p className='text-ssm text-gray-100'>UPLOAD REQUIREMENTS</p>
+            <ul className='list-disc list-inside text-ssm text-gray-100'>
+              <li>File type: JPEG, PNG, GIF</li>
+              <li>Recommended file size: 256 KB(We'll compress it for you)</li>
+              <li>Recommended dimensions: 128x128</li>
+              <li>Naming: Emoji names must be at least 2 characters long and can only contain alphanumeric characters and underscores</li>
+            </ul>
+            <button className='bg-blue-50 hover:bg-blue-200 px-3 py-2 text-ssm w-24 rounded-sm'>Upload Emoji</button>
+
+            <p className="text-sm font-medium">Emoji - X slots available</p>        
+            <div className='grid grid-cols-2'>
+              <div className='flex space-x-5'>
+                <p className="text-ssm font-bold text-gray-100 text-left">IMAGE</p>
+                <p className="text-ssm font-bold text-gray-100 text-left">NAME</p>
+              </div>
+              <p className="text-ssm font-bold text-gray-100 text-left">UPLOADED BY</p>
+            </div>
+
+            <div className='flex space-x-2 group'>
+              <div className='grid grid-cols-2 group border-b border-[#46484b] py-3'>
+                <div className='flex space-x-5'>
+                  <img src={process.env.REACT_APP_IMG} className="w-8" alt='emote'/>
+                  <input value={input.serverName} type="text" onChange={(e) => setInput({...input, serverName:e.target.value})}
+                    className="text-sm rounded-l-sm group-hover:bg-[#1E1F22] focus:bg-[#1E1F22] bg-black-100 transition-all text-gray-300 border-0 ring-0 outline-none resize-none"/>
+                </div>
+                <div className='flex items-center ml-5'>
+                  <img src={process.env.REACT_APP_IMG} className="w-8" alt='emote'/>
+                  <p className='text-ssm text-gray-100 -mt-1'>username</p>
+                </div>
+              </div>
+              <button className='text-red-500 border border-black-400 rounded-full hidden  w-5 h-5 text-ssm group-hover:flex -mt-5 items-center justify-center'><FontAwesomeIcon icon={faX}/></button>
+            </div>
+            
+            
+          </div>)
       case "Logs":
         return <p>Logs</p>
       case "Bans":
