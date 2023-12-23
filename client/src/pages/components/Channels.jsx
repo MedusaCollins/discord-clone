@@ -3,7 +3,7 @@ import axios from 'axios'
 import { io } from "socket.io-client";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faAngleDown, faHashtag, faVolumeHigh, faArrowRightFromBracket, faX, faGear, faUser ,faUserPlus, faChevronRight, faUserGroup, faMagnifyingGlass, faShieldHalved, faEllipsis } from '@fortawesome/free-solid-svg-icons'
+import { faAngleDown, faHashtag, faVolumeHigh, faArrowRightFromBracket, faX, faGear, faUser ,faUserPlus, faChevronRight, faChevronDown, faUserGroup, faMagnifyingGlass, faShieldHalved, faEllipsis, faCircleCheck } from '@fortawesome/free-solid-svg-icons'
 import { faCircleXmark } from '@fortawesome/free-regular-svg-icons'
 
 const Channels = (params) => {
@@ -17,8 +17,14 @@ const Channels = (params) => {
     setSocket(socket);
   }, []);
   
+  const [filterMenu, setFilterMenu] = useState({
+    userPopup: false,
+    user: "",
+  })
+
   const [input, setInput] = useState({
     serverName: selectedServer.name,
+    searchMembers: ""
   })
   useEffect(() => {
     setInput({serverName: selectedServer.name})
@@ -47,7 +53,7 @@ const Channels = (params) => {
     "Overview",
     "Roles",
     "Emoji",
-    "Logs",
+    "Audit Log",
     "Bans",
     "Custom Invite Link"
   ];
@@ -118,7 +124,7 @@ const Channels = (params) => {
               <FontAwesomeIcon icon={faChevronRight} className='text-sm text-gray-100 font-thin col-span-1'/>
             </button>
 
-            <div className='flex items-center space-x-2'>
+            <div className='flex items-center'>
               <div className='items-center flex w-full'>
                 <input value={input.serverName} type="text" onChange={(e) => setInput({...input, serverName:e.target.value})}
                   className="w-full px-2 py-2 text-sm rounded-l-sm bg-[#1E1F22] text-gray-300 border-0 ring-0 outline-none resize-none"/>
@@ -190,8 +196,41 @@ const Channels = (params) => {
             
             
           </div>)
-      case "Logs":
-        return <p>Logs</p>
+      case "Audit Log":
+        return (
+          <div className='w-[500px] space-y-3'>
+            <div className='flex justify-between border-b border-[#46484b] pb-4 mb-2'>
+              <p className='font-bold'>Audit Log</p>
+              <div className='flex flex-col'>
+                <div className='flex  gap-3 text-gray-200 text-ssm'>
+                <p>Filter by User<button onClick={() => setFilterMenu({...filterMenu, userPopup: !filterMenu.userPopup})}  className='ml-3'>All <FontAwesomeIcon icon={faChevronDown}  className='text-white mx-0.5 text-[8px]'/></button></p>
+                </div>
+              {filterMenu.userPopup && (
+              <div className='bg-black-100 border border-black-50 absolute mt-7 shadow-inner p-2'>
+                <div className='flex'>
+                <input value={input.searchMembers} type="text" onChange={(e) => setInput({...input, searchMembers:e.target.value})} placeholder='Search Members'
+                  className=" px-2 py-2 mb-2 text-sm rounded-l-sm bg-[#1E1F22] text-gray-300 border-0 ring-0 outline-none resize-none"/>
+                <FontAwesomeIcon icon={faMagnifyingGlass} className='text-gray-100 bg-[#1E1F22] py-2.5 px-2 rounded-r-sm'/>
+                </div>
+                <div className='space-y-1 max-h-[200px] shadow-3xl overflow-auto no-scrollbar'>
+                <button className='flex justify-between items-center text-white w-full px-2 py-3 bg-blue-50 rounded-md'><span className='flex items-center text-sm gap-2'><FontAwesomeIcon icon={faUserGroup} alt="All user" className='w-6'/>All Users</span> <FontAwesomeIcon icon={faCircleCheck} className='text-sm'/></button>
+                {selectedServer.serverUsers.map((user, index) => (
+                  <button key={index} className='flex justify-between items-center text-gray-100 w-full px-2 py-3 hover:bg-black-50 rounded-md'><span className='flex items-center text-ssm gap-2'><img src={user.imageUrl} alt="user" className='w-6 rounded-full'/> {user.name}</span></button>
+                  ))}
+                </div>
+              </div>)}
+              </div>
+            </div>
+            
+            
+            <div className='space-y-2'>
+              <div className='w-full flex items-center text-sm py-1 px-2 rounded-md bg-black-200 border border-black-400'>
+                    <FontAwesomeIcon icon={faMagnifyingGlass} className='text-gray-100'/>
+                    <img src={process.env.REACT_APP_IMG} alt="user" className='w-10 rounded-full'/>
+                    <p className='text-gray-100'>username do blabllalbal.</p>
+              </div>
+            </div>
+          </div>)
       case "Bans":
         return <p>Bans</p>
       case "Custom Invite Link":
