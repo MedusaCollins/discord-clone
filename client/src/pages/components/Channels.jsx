@@ -3,7 +3,7 @@ import axios from 'axios'
 import { io } from "socket.io-client";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faAngleDown, faHashtag, faVolumeHigh, faArrowRightFromBracket, faX, faGear, faUser ,faUserPlus, faChevronRight, faChevronDown, faUserGroup, faMagnifyingGlass, faShieldHalved, faEllipsis, faCircleCheck } from '@fortawesome/free-solid-svg-icons'
+import { faAngleDown, faHashtag, faVolumeHigh, faArrowRightFromBracket, faX, faGear, faUser ,faUserPlus, faChevronRight, faChevronDown, faUserGroup, faMagnifyingGlass, faShieldHalved, faEllipsis, faCircleCheck, faGavel } from '@fortawesome/free-solid-svg-icons'
 import { faCircleXmark } from '@fortawesome/free-regular-svg-icons'
 
 const Channels = (params) => {
@@ -19,12 +19,15 @@ const Channels = (params) => {
   
   const [filterMenu, setFilterMenu] = useState({
     userPopup: false,
+    banPopup: true,
+    selectedUser: [],
     user: "",
   })
 
   const [input, setInput] = useState({
     serverName: selectedServer.name,
-    searchMembers: ""
+    searchMembers: "",
+    searchUserId: ""
   })
   useEffect(() => {
     setInput({serverName: selectedServer.name})
@@ -54,8 +57,7 @@ const Channels = (params) => {
     "Roles",
     "Emoji",
     "Audit Log",
-    "Bans",
-    "Custom Invite Link"
+    "Bans"
   ];
 
   const showSettingsMenu = () => {
@@ -232,9 +234,34 @@ const Channels = (params) => {
             </div>
           </div>)
       case "Bans":
-        return <p>Bans</p>
-      case "Custom Invite Link":
-        return <p>Custom Invite Link</p>
+        return (
+          <div className='w-[500px] space-y-3'>
+            <p className='font-semibold'>Server Ban List</p>
+            <p className='text-ssm text-gray-100'>Bans by default are by account and IP. A user can circumvent an IP ban by using a proxy.</p>
+
+            <div className='flex items-center gap-2'>
+              <div className='items-center w-full flex'>
+                <input value={input.searchUserId} type="text" onChange={(e) => setInput({...input, searchUserId:e.target.value})} placeholder='Search Bans by User Id'
+                  className="px-2 py-1.5 text-sm rounded-l-sm bg-[#1E1F22] w-full text-gray-300 border-0 ring-0 outline-none resize-none"/>
+                <FontAwesomeIcon icon={faMagnifyingGlass} className='text-gray-100 bg-[#1E1F22] py-2 px-2 rounded-r-sm'/>
+              </div>
+              <button className='bg-blue-50 hover:bg-blue-200 px-3 py-2 text-ssm rounded-sm'>Search</button>
+            </div>
+
+
+            {/* Buradaki kısımda databaseyi düzelttikten sonra banlanan birisi varsa alttaki şekilde gösterilecek */}
+            <div className='flex flex-col items-center justify-center rounded-md text-sm text-gray-200 border border-black-300 border-b-2 shadow-3xl h-[500px] space-y-2'>
+              <FontAwesomeIcon icon={faGavel} className='text-6xl mb-10'/>
+              <p className='font-bold text-gray-100'>NO BANS</p>
+              <p className='w-64'>You haven't banned anybody... but if and when you must, do not hesitate!</p>
+            </div>
+
+            {/* <div className='flex flex-col items-center p-3 rounded-md text-sm text-gray-200 border border-black-300 border-b-2 shadow-3xl h-[500px] space-y-0.5'>
+            {selectedServer.serverUsers.map((user, index) => (
+                  <button onClick={()=> setFilterMenu({...filterMenu, banPopup: true, selectedUser: user})} key={index} className='flex justify-between items-center w-full px-2 py-3 text-gray-100 bg-[#3F4147] hover:bg-black-50 rounded-md'><span className='flex items-center text-ssm gap-2'><img src={user.imageUrl} alt="user" className='w-6 rounded-full'/> {user.name}</span></button>
+                ))}
+            </div> */}
+          </div>)
       default:
         return true;
     }
@@ -309,7 +336,7 @@ const Channels = (params) => {
                     <p className='flex p-1 text-ssm font-bold'>MODERATION</p>
                   </span>
                 }
-                <li key={index} onClick={()=> setCurrentStep(index)} className={`p-1 cursor-pointer rounded-md ${currentStep===index ? 'text-white bg-black-focus' :'hover:bg-black-hover'}`}>{step}</li>
+                <li key={index} onClick={()=> setCurrentStep(index)} className={`p-1 my-0.5 cursor-pointer rounded-md ${currentStep===index ? 'text-white bg-black-focus' :'hover:bg-black-hover'}`}>{step}</li>
                 </div>
               ))}
             </ul>
@@ -319,6 +346,28 @@ const Channels = (params) => {
             <button className="text-3xl text-gray-200 hover:text-gray-100 h-0" onClick={()=> setPopup({...popup, serverSettings: false})}><FontAwesomeIcon icon={faCircleXmark} /></button>
         </div>        
       </div> 
+      )}
+
+      {filterMenu.banPopup && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#000000] bg-opacity-60" onClick={() => setFilterMenu({...filterMenu, banPopup: false})}>
+      <div className="relative bg-[#313338] rounded-md shadow-md mx-5" onClick={(e) => e.stopPropagation()}>
+        <div className="text-center sm:w-96">
+            <div className='p-4'>
+              <p className='text-2xl text-white'>{filterMenu.selectedUser.name}</p>
+              <div className='flex flex-col text-left text-ssm text-gray-100'>
+                <label htmlFor="Server name" className="block text-ssm font-bold leading-6 text-gray-100">
+                  BAN REASON
+                </label>
+                <p>No reason provided</p>
+              </div>
+            </div>
+            <div className='justify-between flex p-4 rounded-b-xl bg-black-200'>
+              <button onClick={() => setFilterMenu({...filterMenu, banPopup: false})} className='text-white text-ssm px-5 py-2 rounded-sm bg-blue-50 hover:bg-blue-200'>Done</button>
+              <button onClick={() => setFilterMenu({...filterMenu, banPopup: false})} className='text-red-400 hover:underline text-ssm'>Revoke Ban</button>
+            </div>
+        </div>
+      </div>
+      </div>
       )}
     </div>
   )

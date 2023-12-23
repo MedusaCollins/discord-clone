@@ -59,7 +59,7 @@ const ServerSelect = (params) => {
     if(popup.section === 1){
       return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#000000] bg-opacity-60" onClick={() => setPopup({...popup, createServer: false})}>
-          <div className="relative bg-[#313338] rounded-xl shadow-md mx-5" onClick={(e) => e.stopPropagation()}>
+          <div className="relative bg-[#313338] rounded-md shadow-md mx-5" onClick={(e) => e.stopPropagation()}>
             <div className="text-center sm:w-96">
                 <div className='p-4'>
                   <p className='text-2xl text-white font-semibold'>Create a server</p>
@@ -85,7 +85,7 @@ const ServerSelect = (params) => {
           setPopup({...popup, createServer: false, section:1});
           setInput({...input, errorHandler: '', joinServer: ''});
         }}>
-          <div className="relative bg-[#313338] rounded-xl shadow-md mx-5" onClick={(e) => e.stopPropagation()}>
+          <div className="relative bg-[#313338] rounded-md shadow-md mx-5" onClick={(e) => e.stopPropagation()}>
             <div className="text-center sm:w-96">
               <form onSubmit={joinServer}>
                 <div className='p-4'>
@@ -114,7 +114,7 @@ const ServerSelect = (params) => {
     } else if(popup.section === 3){
       return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#000000] bg-opacity-60" onClick={() => setPopup({...popup, createServer: false, section:1})}>
-          <div className="relative bg-[#313338] rounded-xl shadow-md mx-5" onClick={(e) => e.stopPropagation()}>
+          <div className="relative bg-[#313338] rounded-md shadow-md mx-5" onClick={(e) => e.stopPropagation()}>
             <div className="text-center sm:w-96">
               <form onSubmit={createServer}>
                 <div className='p-4'>
