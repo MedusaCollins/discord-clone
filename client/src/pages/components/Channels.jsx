@@ -19,7 +19,7 @@ const Channels = (params) => {
   
   const [filterMenu, setFilterMenu] = useState({
     userPopup: false,
-    banPopup: true,
+    banPopup: false,
     selectedUser: [],
     user: "",
   })

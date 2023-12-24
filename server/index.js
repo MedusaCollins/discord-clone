@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import { Server } from "socket.io";
 import http from "http";
 import cors from "cors";
-import dotenv from "dotenv";
+import dotenv, { populate } from "dotenv";
 import Serverdb from "./model/servers.js";
 
 
@@ -205,6 +205,8 @@ app.post("/listServers", async (req, res) => {
     console.error("Login error:", error);
   }
 });
+
+
 app.post("/getServer", async (req, res) => {
   try {
     const server = await Serverdb.findById(req.body.serverID);
@@ -216,20 +218,28 @@ app.post("/getServer", async (req, res) => {
 
 io.on("connection", (socket) => {
   try {  
-    socket.on("chat message", async (msg) => {
+    socket.on("sendMessage", async (msg) => {
       try {
         const server = await Serverdb.findOne({ "channels._id": msg.channelID });
         const channel = server.channels.find(channel => channel._id == msg.channelID);
         const message={
           message: msg.text,
-          user: msg.user
+          user: msg.user,
         }
+
         channel.messages.push(message);
         await Serverdb.findByIdAndUpdate(server._id, { $set: { channels: server.channels } }, { new: true});
         io.emit("getMessage", {server: server});
       } catch (error) {
         console.error("Error finding server:", error);
       }
+    });
+    socket.on("removeMessage", async (msg) => {
+      const server = await Serverdb.findOne({ "channels.messages._id": msg.message._id });
+      const channel = server.channels.find(channel => channel._id == msg.channelID);
+      channel.messages = channel.messages.filter(message => message._id != msg.message._id);
+      await Serverdb.findByIdAndUpdate(server._id, { $set: { channels: server.channels } }, { new: true});
+      io.emit("getMessage", {server: server});
     });
     socket.on("joinServer", async (server) => {
       io.emit("joinServer", {serverID: server.serverID});

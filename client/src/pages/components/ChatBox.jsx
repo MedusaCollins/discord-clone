@@ -1,20 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlus } from '@fortawesome/free-solid-svg-icons'
+import { faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { io } from "socket.io-client";
 
 const ChatBox = (params) => {
-  const { selected, selectedServer, setServer } = params
+  const { selected, selectedServer, setServer, access} = params
   const [selectedChannel, setSelectedChannel] = useState(null)
-
   useEffect(() => {
     if (selectedServer !== "" && selected.channelID !== null) {
       setSelectedChannel(selectedServer.channels.find(channel => channel._id === selected.channelID))
     }
   }, [selectedServer, selected]);
 
+  
   const chatAreaRef = useRef(null);
-  const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
   const [socket, setSocket] = useState(null);
 
@@ -22,13 +21,14 @@ const ChatBox = (params) => {
     const socket = io(process.env.REACT_APP_SERVER);
     setSocket(socket);
     socket.on("getMessage", (data) => {
-      setServer(data.server)
+      if (data.server._id === selectedServer._id){
+        setServer(data.server)
+      }
     });
     return () => {
       socket.disconnect();
     };
-  }, []);
-
+  }, [setServer, selectedServer]);
   useEffect(() => {
     if (chatAreaRef.current) {
       const chatArea = chatAreaRef.current;
@@ -45,10 +45,13 @@ const ChatBox = (params) => {
     event.preventDefault();
     let user = selectedServer.serverUsers.find(u => u.name === params.user.name)
     if (message !== "" && socket) {
-      socket.emit("chat message", { serverID: selected.serverID, channelID: selected.channelID, text: message, user });
+      socket.emit("sendMessage", { serverID: selected.serverID, channelID: selected.channelID, text: message, user });
       setMessage("");
     }
   };
+  const removeMessage = (msg) => {
+    socket.emit("removeMessage", { message: msg, channelID: selectedChannel._id, deletedBy: params.user });
+  }
 
   return (
     <div className="w-[80%] h-screen text-sm flex bg-black-100">
@@ -56,12 +59,17 @@ const ChatBox = (params) => {
         <div className='flex flex-col justify-between relative w-full'>
           <ul ref={chatAreaRef} className='overflow-auto'>
             {selectedChannel.messages.map((msg, index) => (
-              <div key={index} className='flex space-x-5 m-5 p-2 rounded-xl items-center hover:bg-black-200'>
-                <img src={msg.user.imageUrl} alt="" className='w-8 h-8 rounded-full' />
-                <div>
-                  <p style={{ color: `${selectedServer.serverRoles && selectedServer.serverRoles.find(role => role.name === msg.user.roles[0]).color}` }}>{msg.user.name}</p>
-                  <p className='text-slate-100 text-xs'>{msg.message}</p>
-                </div>
+              <div key={index} className='flex space-x-5 m-5 p-2 rounded-xl items-center break-words relative group hover:bg-black-200'>
+                  <img src={msg.user.imageUrl} alt="" className='w-8 h-8 rounded-full absolute top-2.5' />
+                  <div className='px-5'>
+                    <p style={{ color: `${selectedServer.serverRoles && selectedServer.serverRoles.find(role => role.name === msg.user.roles[0]).color}` }}>{msg.user.name}</p>
+                    <p className='text-slate-100 text-xs text-wrap break-words max-w-[1350px]'>{msg.message}</p>
+                  </div>
+                {msg.user.email === params.user.email || access.manageMessages ? (
+                  <div className='-top-3 right-5 absolute bg-black-100 rounded-md border-2 shadow-3xl border-black-200 hidden group-hover:flex overflow-auto'>
+                    <button onClick={()=> removeMessage(msg)} className='p-2 hover:bg-[#38393d]'><FontAwesomeIcon icon={faTrash} className='text-red-500 text-xs' /></button>
+                  </div>
+                  ): null}
               </div>
             ))}
           </ul>

@@ -25,6 +25,20 @@ export default function Home(params) {
     const [data, setData] = useState([])
     const [socket, setSocket] = useState(null);
 
+
+
+    function checkUserRole(server, user){
+        if (server.serverUsers !== undefined){
+          var user = server.serverUsers.find(u => u.email === user.email)
+          var role = server.serverRoles.find(role => role.name === user.roles[0])
+          return role
+        }
+        else{
+          return null
+        }
+    }
+    const [access, setAccess] = useState(null)
+
     useEffect(() => {
         const socket = io(process.env.REACT_APP_SERVER);
         setSocket(socket);
@@ -58,18 +72,21 @@ export default function Home(params) {
       useEffect(() => {
         axios.post(`${process.env.REACT_APP_SERVER}/getServer`, { serverID: selected.serverID}).then(res => {
             setServer(res.data);
-            setPopup({...popup, serverInfo:false})
+            setPopup({...popup, serverInfo:false});
+            if (selected.serverID !== undefined && selected.serverID !== null){
+                setAccess(checkUserRole(res.data, user).access)
+            }else{
+                setAccess(null)
+            }
         })
     }
     , [selected]);
-
-
 
     return(
         <div className="flex">
             <ServerSelect selected={selected} setSelected={setSelected} user={user} data={data} setData={setData}/>
             <Channels selected={selected} setSelected={setSelected} setData={setData} selectedServer={server} user={user} setLogin={params.setLogin} popup={popup} setPopup={setPopup}/>
-            <ChatBox selected={selected} selectedServer={server} setServer={setServer} user={user}/>
+            <ChatBox selected={selected} selectedServer={server} setServer={setServer} user={user} access={access}/>
             <Users selected={selected} selectedServer={server}/>
         </div>
     )
