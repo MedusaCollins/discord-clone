@@ -3,11 +3,11 @@ import axios from 'axios'
 import { io } from "socket.io-client";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faAngleDown, faHashtag, faVolumeHigh, faArrowRightFromBracket, faX, faGear, faUser ,faUserPlus, faChevronRight, faChevronDown, faUserGroup, faMagnifyingGlass, faShieldHalved, faEllipsis, faCircleCheck, faGavel } from '@fortawesome/free-solid-svg-icons'
-import { faCircleXmark } from '@fortawesome/free-regular-svg-icons'
+import { faAngleDown, faHashtag, faVolumeHigh, faArrowRightFromBracket, faX, faGear, faUser ,faUserPlus, faChevronRight, faChevronDown, faUserGroup, faMagnifyingGlass, faShieldHalved, faEllipsis, faCircleCheck, faGavel, faPlus } from '@fortawesome/free-solid-svg-icons'
+import { faCircleXmark, faCircle, faCircleDot } from '@fortawesome/free-regular-svg-icons'
 
 const Channels = (params) => {
-  const {selected, selectedServer, setSelected,setData, user, popup, setPopup} = params
+  const {selected, selectedServer, setSelected,setData, user, popup, setPopup, access} = params
   const [text, setText] = React.useState('Copy')
   const [selectedChannel, setSelectedChannel] = useState(selected.channelID)
 
@@ -27,10 +27,12 @@ const Channels = (params) => {
   const [input, setInput] = useState({
     serverName: selectedServer.name,
     searchMembers: "",
-    searchUserId: ""
+    searchUserId: "",
+    channelType: "",
+    channelName: "",
   })
   useEffect(() => {
-    setInput({serverName: selectedServer.name})
+    setInput({serverName: selectedServer.name, channelType: "Text"})
   }, [selectedServer])
 
   function invite(){
@@ -278,8 +280,11 @@ const Channels = (params) => {
           {popup.serverInfo && (
             <div className='bg-black-400 absolute w-[90%] m-2 rounded-md'>
               <ul className='p-2'>
-                <li onClick={()=> setPopup({...popup, serverSettings:true, serverInfo:false})} className="hover:bg-blue cursor-pointer text-gray-100 hover:text-white hover:bg-blue-50 p-1 px-2 text-sm justify-between flex items-center rounded-sm">Server Settings <FontAwesomeIcon icon={faGear} /></li>
                 <li onClick={()=> setPopup({...popup, invite:true})} className="hover:bg-blue-50 cursor-pointer text-blue-50 hover:text-white p-1 px-2 text-sm justify-between flex items-center rounded-sm">Invite People <FontAwesomeIcon icon={faUserPlus} /></li>
+                <li className='border-b-2 border-[#2e2f31] my-1'></li>
+                <li onClick={()=> setPopup({...popup, serverSettings:true, serverInfo:false})} className="hover:bg-blue cursor-pointer text-gray-100 hover:text-white hover:bg-blue-50 p-1 px-2 text-sm justify-between flex items-center rounded-sm">Server Settings <FontAwesomeIcon icon={faGear} /></li>
+                {access.manageChannels && <li onClick={()=> setPopup({...popup, createChannel:true, serverInfo:false})} className="hover:bg-blue cursor-pointer text-gray-100 hover:text-white hover:bg-blue-50 p-1 px-2 text-sm justify-between flex items-center rounded-sm">Create Channel <FontAwesomeIcon icon={faPlus} /></li>}
+                <li className='border-b-2 border-[#2e2f31] my-1'></li>
                 <li onClick={()=> leaveServer()} className="hover:bg-red-500 cursor-pointer text-red-500 hover:text-white p-1 px-2 text-sm justify-between flex items-center rounded-sm">Leave Server <FontAwesomeIcon icon={faArrowRightFromBracket} /></li>
               </ul>
             </div>
@@ -368,6 +373,55 @@ const Channels = (params) => {
         </div>
       </div>
       </div>
+      )}
+
+      {popup.createChannel && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#000000] bg-opacity-60" onClick={() => setPopup({...popup, createChannel: false})}>
+        <div className="relative bg-[#313338] rounded-md shadow-md mx-5" onClick={(e) => e.stopPropagation()}>
+          <div className="text-center sm:w-96">
+              <div className='p-4 flex flex-col gap-5 text-left'>
+                <p className='text-2xl text-white'>{filterMenu.selectedUser.name}</p>
+                <div className='flex flex-col gap-2 text-left text-ssm text-gray-100'>
+                  <label htmlFor="Channel Type" className="block text-ssm -mb-2 font-bold leading-6 ">
+                    CHANNEL TYPE
+                  </label>
+                  {console.log(input.channelType)}
+                  <button onClick={() => setInput({...input, channelType: "Text"})} className={`flex justify-between items-center ${input.channelType === "Text" ? 'bg-black-focus':'bg-black-200 hover:bg-black-hover '} rounded-md p-2 pb-3`}>
+                    <div className='flex text-left gap-2 justify-items items-center'>
+                      <FontAwesomeIcon icon={faHashtag} className='px-2 text-xl'/>
+                      <div className='flex flex-col'>
+                        <p className='text-base text-white'>Text</p>
+                        <p>Send messages, images, GIFs, emoji, opinions, and puns</p>
+                      </div>
+                    </div>
+                    <FontAwesomeIcon icon={input.channelType === "Text" ? faCircleDot : faCircle} className="text-lg"/>
+                  </button>
+                  <button onClick={() => setInput({...input, channelType: "Voice"})} className={`flex justify-between items-center ${input.channelType === "Voice" ? 'bg-black-focus':'bg-black-200 hover:bg-black-hover '} rounded-md p-2 pb-3`}>
+                    <div className='flex text-left gap-2 justify-items items-center'>
+                      <FontAwesomeIcon icon={faVolumeHigh} className='px-1 text-xl'/>
+                      <div className='flex flex-col'>
+                        <p className='text-base text-white'>Voice</p>
+                        <p>Hang out together with voice, video and screen share</p>
+                      </div>
+                    </div>
+                    <FontAwesomeIcon icon={input.channelType === "Voice" ? faCircleDot : faCircle} className="text-lg"/>
+                  </button>
+                </div>
+                <div className='-mt-2'>
+                <label htmlFor="channel name" className="block text-ssm font-bold leading-6 text-gray-100">
+                  CHANNEL NAME
+                </label>
+                <input value={input.channelName} type="text" onChange={(e) => setInput({...input, channelName:e.target.value})}
+                className="w-full px-2 py-2 text-sm rounded-sm bg-[#1E1F22] text-gray-300 border-0 ring-0 outline-none resize-none" />
+              </div>
+              </div>
+              <div className='flex p-4 justify-end gap-5 rounded-b-xl bg-black-200'>
+                <button onClick={() => setPopup({...popup, createChannel: false})} className='hover:underline text-ssm'>Cancel</button>
+                <button  className='text-white text-ssm px-3 py-2 rounded-sm bg-blue-50 hover:bg-blue-200'>Create Channel</button>
+              </div>
+          </div>
+        </div>
+        </div>
       )}
     </div>
   )

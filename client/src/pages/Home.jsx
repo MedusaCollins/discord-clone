@@ -17,7 +17,8 @@ export default function Home(params) {
         serverInfo: false,
         serverSettings: false,
         invite: false,
-        leave: false
+        leave: false,
+        createChannel: false,
       })
 
     const [server, setServer] = useState([{}]);
@@ -85,7 +86,7 @@ export default function Home(params) {
     return(
         <div className="flex">
             <ServerSelect selected={selected} setSelected={setSelected} user={user} data={data} setData={setData}/>
-            <Channels selected={selected} setSelected={setSelected} setData={setData} selectedServer={server} user={user} setLogin={params.setLogin} popup={popup} setPopup={setPopup}/>
+            <Channels selected={selected} setSelected={setSelected} setData={setData} selectedServer={server} user={user} setLogin={params.setLogin} popup={popup} setPopup={setPopup} access={access}/>
             <ChatBox selected={selected} selectedServer={server} setServer={setServer} user={user} access={access}/>
             <Users selected={selected} selectedServer={server}/>
         </div>
