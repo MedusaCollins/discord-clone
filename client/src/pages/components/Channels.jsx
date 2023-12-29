@@ -3,7 +3,7 @@ import axios from 'axios'
 import { io } from "socket.io-client";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faAngleDown, faHashtag, faVolumeHigh, faArrowRightFromBracket, faX, faGear, faUser ,faUserPlus, faChevronRight, faChevronDown, faUserGroup, faMagnifyingGlass, faShieldHalved, faEllipsis, faCircleCheck, faGavel, faPlus } from '@fortawesome/free-solid-svg-icons'
+import { faAngleDown, faHashtag, faVolumeHigh, faArrowRightFromBracket, faX, faGear, faUser ,faUserPlus, faChevronRight, faChevronDown, faUserGroup, faMagnifyingGlass, faShieldHalved, faEllipsis, faCircleCheck, faGavel, faPlus, faTrashCan } from '@fortawesome/free-solid-svg-icons'
 import { faCircleXmark, faCircle, faCircleDot } from '@fortawesome/free-regular-svg-icons'
 
 const Channels = (params) => {
@@ -49,21 +49,89 @@ const Channels = (params) => {
           socket.emit('leaveServer', { serverID: selectedServer._id });
         });
       }
-      return null; // Add return statement
+      return null;
     });
   }
 
+  function createChannel(){
+    const request = {
+      server: selectedServer,
+      channel: {
+        name: input.channelName,
+        type: input.channelType,
+        access: {
+          "read": [
+            "Owner",
+            "Admin",
+            "Moderator",
+            "Member",
+            "Guest"
+          ],
+          "write": [
+            "Owner",
+            "Admin",
+            "Moderator",
+            "Member"
+          ]
+        },
+        messages: [],
+      }
+    }
+    if(access.manageChannels){
+      setPopup({...popup, createChannel: false})
+      socket.emit('createChannel', request);
+    }
+  }
+
+  function deleteChannel(channel){
+    socket.emit('deleteChannel', {server: selectedServer, channel: channel})
+    setPopup({...popup, channelSettings: false})
+  }
+
   const [currentStep, setCurrentStep] = useState(0);
-  const steps = [
+  const serverSettings = [
     "Overview",
     "Roles",
     "Emoji",
     "Audit Log",
     "Bans"
   ];
+  const channelSettings = [
+    "Overview",
+    "Permissions"
+  ]
+
+  const showChannelSettingsMenu = () => {
+    switch (channelSettings[currentStep]) {
+      case "Overview":
+        return (
+        <div className='w-[500px]'>
+          <p className='mb-2 font-bold'>Channel Overview</p>
+          <div className='divide-y divide-[#46484b] space-y-6'>
+            <div className='grid grid-cols-2 space-x-3'>
+              <div className='grid grid-cols-3 space-x-5'>
+                <img src={selectedServer.image} alt='server' className='rounded-full w-20'/>
+                <div className='col-span-2 space-y-3'>
+                <p className='text-ssm text-gray-100'>We recommend an image of at least 512x512 for the server.</p>
+                <button className='text-ssm border border-[#46484b] rounded-sm px-2 py-1.5'>Upload Image</button>
+                </div>
+              </div>
+            </div>
+            <div className='pt-5'>
+                <label htmlFor="invite link" className="block text-ssm font-bold leading-6 text-gray-100">
+                  CHANNEL NAME
+                </label>
+                <input value={input.serverName} type="text" onChange={(e) => setInput({...input, serverName:e.target.value})}
+                className="w-full px-2 py-2 text-sm rounded-sm bg-[#1E1F22] text-gray-300 border-0 ring-0 outline-none resize-none" />
+              </div>
+          </div>
+        </div>)
+    }
+  }
+            
 
   const showSettingsMenu = () => {
-    switch (steps[currentStep]) {
+    switch (serverSettings[currentStep]) {
       case "Overview":
         return (
         <div className='w-[500px]'>
@@ -269,7 +337,9 @@ const Channels = (params) => {
     }
   };
 
-
+  function showChannelSettings(channel){
+    setPopup({channelSettings: true, channelInfo: channel})
+  }
   return (
     <div className="w-[10%] h-screen bg-black-200 text-white flex flex-col relative justify-between">
       {selectedServer.channels != null &&
@@ -289,24 +359,32 @@ const Channels = (params) => {
               </ul>
             </div>
           )}
+
+
           {selectedServer.channels.map((channel,index) => (
             <div key={index} onClick={() => (selected.channelID!==channel._id ? setSelected({...selected, channelID:channel._id}) : null)} 
-            className={`flex items-center h-7 mx-2 my-1 px-2 cursor-pointer rounded-md transition-all
+            className={`flex items-center group h-7 mx-2 my-1 px-2 cursor-pointer rounded-md transition-all
             ${selected.channelID===channel._id ? 'bg-black-focus' :'hover:bg-black-hover'}`}>
 
               <span className='text-sm text-[#80848E] flex gap-5 items-center'>
-                {channel.type==='text' ? <FontAwesomeIcon icon={faHashtag} className='mx-0.5'/> :
+                {channel.type==='Text' ? <FontAwesomeIcon icon={faHashtag} className='mx-0.5'/> :
                  <FontAwesomeIcon icon={faVolumeHigh} />} <span className={`${selected.channelID===channel._id ? 'text-white' :''}`} >{channel.name}</span>
               </span>
+              {access.manageChannels &&
+              <FontAwesomeIcon icon={faGear} className='right-5 absolute hidden group-hover:block text-sm text-gray-100 hover:text-gray-50 col-span-1' onClick={() => showChannelSettings(channel)}/>}
             </div>
           ))}
         </div>
       }
+
+
       <div className='bg-black-300 absolute bottom-0 w-full h-10 flex items-center'>
         <img src={user.imageUrl} alt="" className='w-6 h-6 rounded-full mx-2'/>
         <p className='text-sm'>{user.name}</p>
         <button onClick={()=> params.setLogin(false)} className='right-2 absolute'><FontAwesomeIcon icon={faArrowRightFromBracket} /></button>
       </div>
+
+
 
       {popup.invite && (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#000000] bg-opacity-60" onClick={() => setPopup({...popup, invite: false})}>
@@ -333,7 +411,7 @@ const Channels = (params) => {
         <div className='bg-[#2B2D31] w-[38.4%] items-end px-2 text-left flex flex-col divide-y divide-[#46484b] space-y-3'>
             <ul className='w-40 text-sm text-gray-100 pt-5'>
               <p className='flex p-1 text-ssm font-bold'>{selectedServer.name}</p>
-              {steps.map((step, index) => (
+              {serverSettings.map((step, index) => (
                 <div key={index}>
                 {index===3 && 
                   <span>
@@ -411,17 +489,40 @@ const Channels = (params) => {
                 <label htmlFor="channel name" className="block text-ssm font-bold leading-6 text-gray-100">
                   CHANNEL NAME
                 </label>
-                <input value={input.channelName} type="text" onChange={(e) => setInput({...input, channelName:e.target.value})}
+                <input value={input.channelName || ''} type="text" onChange={(e) => setInput({...input, channelName:e.target.value})}
                 className="w-full px-2 py-2 text-sm rounded-sm bg-[#1E1F22] text-gray-300 border-0 ring-0 outline-none resize-none" />
               </div>
               </div>
               <div className='flex p-4 justify-end gap-5 rounded-b-xl bg-black-200'>
                 <button onClick={() => setPopup({...popup, createChannel: false})} className='hover:underline text-ssm'>Cancel</button>
-                <button  className='text-white text-ssm px-3 py-2 rounded-sm bg-blue-50 hover:bg-blue-200'>Create Channel</button>
+                <button onClick={()=> createChannel()}  className='text-white text-ssm px-3 py-2 rounded-sm bg-blue-50 hover:bg-blue-200'>Create Channel</button>
               </div>
           </div>
         </div>
         </div>
+      )}
+
+      {popup.channelSettings && (
+        <div className="fixed inset-0 z-50 flex bg-[#313338]">
+        <div className='bg-[#2B2D31] w-[38.4%] items-end px-2 text-left flex flex-col divide-y divide-[#46484b] space-y-3'>
+            <ul className='w-40 text-sm text-gray-100 pt-5'>
+              <p className='flex p-1 text-ssm font-bold'>{popup.channelInfo.name}</p>
+              {channelSettings.map((step, index) => (
+                <div key={index}>
+                <li key={index} onClick={()=> setCurrentStep(index)} className={`p-1 my-0.5 cursor-pointer rounded-md ${currentStep===index ? 'text-white bg-black-focus' :'hover:bg-black-hover'}`}>{step}</li>
+                </div>
+              ))}
+              <span>
+                <div className='border-t border-[#46484b] my-2'></div>
+                <button className="p-1 my-0.5 cursor-pointer rounded-md hover:bg-black-hover w-full text-left flex justify-between items-center" onClick={() => deleteChannel(popup.channelInfo)}><p>Delete Channel</p><FontAwesomeIcon icon={faTrashCan} className='mx-0.5 text-ssm right-2 top-2'/></button>
+              </span>
+            </ul>
+        </div>        
+        <div className='flex pt-5 ml-8 space-x-8'>
+              {showChannelSettingsMenu()}
+            <button className="text-3xl text-gray-200 hover:text-gray-100 h-0" onClick={()=> setPopup({...popup, channelSettings: false})}><FontAwesomeIcon icon={faCircleXmark} /></button>
+        </div>        
+      </div> 
       )}
     </div>
   )

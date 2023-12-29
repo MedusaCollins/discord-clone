@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import { Server } from "socket.io";
 import http from "http";
 import cors from "cors";
-import dotenv, { populate } from "dotenv";
+import dotenv from "dotenv";
 import Serverdb from "./model/servers.js";
 
 
@@ -89,19 +89,9 @@ app.post("/createServer", async (req, res) => {
       {
         channelID: '01',
         name: 'General 1',
-        type: 'text',
+        type: 'Text',
         access: { read: ['Owner', 'Admin', 'Moderator', 'Member', 'Guest'], write: ['Owner', 'Admin', 'Moderator', 'Member'] },
-        messages: [
-          {
-            message: 'Hello World',
-            user: {
-              name: req.body.user.name,
-              email: req.body.user.email,
-              imageUrl: req.body.user.imageUrl,
-              roles: ['Owner']
-            }
-          }
-        ]
+        messages: []
       }
     ],
     serverUsers: [
@@ -241,6 +231,19 @@ io.on("connection", (socket) => {
       await Serverdb.findByIdAndUpdate(server._id, { $set: { channels: server.channels } }, { new: true});
       io.emit("getMessage", {server: server});
     });
+
+    socket.on("createChannel", async (data) => {
+      data.server.channels.push(data.channel);
+      // console.log(data.server.channels)
+      await Serverdb.findByIdAndUpdate(data.server._id, { $set: {channels: data.server.channels} }, { new: true});
+      io.emit("channelUpdate", {server: data.server});
+    })
+    socket.on("deleteChannel", async (data) => {
+      data.server.channels = data.server.channels.filter(channel => channel._id != data.channel._id);
+      await Serverdb.findByIdAndUpdate(data.server._id, { $set: {channels: data.server.channels} }, { new: true});
+      io.emit("channelUpdate", {server: data.server});
+    })
+
     socket.on("joinServer", async (server) => {
       io.emit("joinServer", {serverID: server.serverID});
     })

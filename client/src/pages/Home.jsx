@@ -16,6 +16,8 @@ export default function Home(params) {
     const [popup, setPopup] = useState({
         serverInfo: false,
         serverSettings: false,
+        channelSettings: true,
+        channelInfo:{},
         invite: false,
         leave: false,
         createChannel: false,
@@ -55,6 +57,11 @@ export default function Home(params) {
                 axios.post(`${process.env.REACT_APP_SERVER}/getServer`, { serverID: selected.serverID}).then(res => {
                     setServer(res.data);
                 })
+            }
+        })
+        socket.on("channelUpdate", (data) => {
+            if(data.server._id === selected.serverID){
+                setServer(data.server);
             }
         })
         return () => {
