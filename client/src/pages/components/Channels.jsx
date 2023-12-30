@@ -5,7 +5,7 @@ import { io } from "socket.io-client";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleDown, faHashtag, faVolumeHigh, faArrowRightFromBracket, faX, faGear, faUserPlus, faPlus } from '@fortawesome/free-solid-svg-icons'
 
-const Channels = ({selected, selectedServer, setLogin, setSelected,setData, user, popup, setPopup, access, setInput}) => {
+const Channels = ({selected, selectedServer, setLogin, setSelected, data,setData, user, popup, setPopup, access, setInput}) => {
   const [socket, setSocket] = useState(null);
   useEffect(() => {
     const socket = io(process.env.REACT_APP_SERVER);
@@ -28,10 +28,9 @@ const Channels = ({selected, selectedServer, setLogin, setSelected,setData, user
       return null;
     });
   }
-
   return (
     <div className="w-[10%] h-screen bg-black-200 text-white flex flex-col relative justify-between">
-      {selectedServer.channels != null &&
+      {selectedServer.channels != null ?
         <div>
           <button onClick={() => popup.serverInfo ? setPopup({...popup, serverInfo:false}): setPopup({...popup, serverInfo:true})} className='justify-between items-center flex px-5 py-2 w-full hover:bg-black-hover cursor-pointer transition-all'>{selectedServer.name} 
             <span className='text-sm text-gray-100'><FontAwesomeIcon icon={popup.serverInfo ? faX : faAngleDown} /></span>
@@ -62,9 +61,13 @@ const Channels = ({selected, selectedServer, setLogin, setSelected,setData, user
               <FontAwesomeIcon icon={faGear} className='right-5 absolute hidden group-hover:block text-sm text-gray-100 hover:text-gray-50 col-span-1' onClick={() => setPopup({channelSettings: true, showPopup: true, channelInfo: channel})}/>}
             </div>
           ))}
+        </div>:
+        <div className='absolute w-full top-1 h-10 flex flex-col items-center '>
+          <button type="text" className="px-2 py-1 mx-2 w-[90%] text-ssm text-left text-gray-400 rounded-sm bg-[#1E1F22] border-0 ring-0 outline-none resize-none" >Start a conversation</button>
+          <div className='mt-2 w-full'>
+          </div>
         </div>
       }
-
       <div className='bg-black-300 absolute bottom-0 w-full h-10 flex items-center'>
         <img src={user.imageUrl} alt="" className='w-6 h-6 rounded-full mx-2'/>
         <p className='text-sm'>{user.name}</p>

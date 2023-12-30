@@ -23,6 +23,9 @@ export default function Home(params) {
         serverInvite: false,
         leave: false,
         createChannel: false,
+        createServer: false,
+        joinServer: false,
+        section: 1
       })
 
     const [server, setServer] = useState([{}]);
@@ -34,6 +37,9 @@ export default function Home(params) {
         searchUserId: "",
         channelType: "",
         channelName: "",
+        createServer: `${user.name}'s Server`,
+        joinServer: '',
+        errorHandler: ''
       });
     const [data, setData] = useState([])
     const [socket, setSocket] = useState(null);
@@ -52,23 +58,36 @@ export default function Home(params) {
     }
     const [access, setAccess] = useState(null)
 
+    function serverUpdate(){
+        axios.post(`${process.env.REACT_APP_SERVER}/getServer`, { serverID: selected.serverID}).then(res => {
+            setServer(res.data);
+        })
+    }
+    function serversUpdate(){
+        axios.post(`${process.env.REACT_APP_SERVER}/listServers`, { user: params.user })
+          .then(res => {
+            setData(res.data);
+          }).catch(err => {
+            console.log(err);
+          });
+    }
     useEffect(() => {
         const socket = io(process.env.REACT_APP_SERVER);
         setSocket(socket);
         // ServerUpdate diye bir event oluşturduk ve /getServer ile refresh atılması sağlanacak.
         socket.on("joinServer", (data) => {
             if(data.serverID === selected.serverID){
-                axios.post(`${process.env.REACT_APP_SERVER}/getServer`, { serverID: selected.serverID}).then(res => {
-                    setServer(res.data);
-                })
+                serverUpdate()
             }
         })
         socket.on("leaveServer", (data) => {
             if(data.serverID === selected.serverID){
-                axios.post(`${process.env.REACT_APP_SERVER}/getServer`, { serverID: selected.serverID}).then(res => {
-                    setServer(res.data);
-                })
+                serverUpdate()
             }
+        })
+        socket.on("createDM", (data)=>{
+            serversUpdate()
+            // console.log(data.server)
         })
         socket.on("channelUpdate", (data) => {
             if(data.server._id === selected.serverID){
@@ -103,9 +122,9 @@ export default function Home(params) {
 
     return(
         <div className="flex">
-            <PopupManager input={input} setInput={setInput} selected={selected} selectedServer={server} popup={popup} setPopup={setPopup} access={access}/>
-            <ServerSelect selected={selected} setSelected={setSelected} user={user} data={data} setData={setData}/>
-            <Channels input={input} setInput={setInput} selected={selected} setSelected={setSelected} setData={setData} selectedServer={server} user={user} setLogin={params.setLogin} popup={popup} setPopup={setPopup} access={access}/>
+            <PopupManager input={input} setInput={setInput} selected={selected} selectedServer={server} popup={popup} setPopup={setPopup} access={access} user={user} data={data} setData={setData}/>
+            <ServerSelect selected={selected} setSelected={setSelected} user={user} data={data} setData={setData} popup={popup} setPopup={setPopup}/>
+            <Channels input={input} setInput={setInput} selected={selected} setSelected={setSelected} data={data} setData={setData} selectedServer={server} user={user} setLogin={params.setLogin} popup={popup} setPopup={setPopup} access={access}/>
             <ChatBox selected={selected} selectedServer={server} setServer={setServer} user={user} access={access}/>
             <Users selected={selected} selectedServer={server}/>
         </div>

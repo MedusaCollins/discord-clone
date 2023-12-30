@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { io } from "socket.io-client";
+// fix that path later
+import img from './../../static/lost.svg';
 
 const ChatBox = (params) => {
   const { selected, selectedServer, setServer, access} = params
@@ -54,7 +56,7 @@ const ChatBox = (params) => {
   }
 
   return (
-    <div className="w-[80%] h-screen text-sm flex bg-black-100">
+    <div className={`${selected.serverID !== null && selectedServer !== "" ? 'w-[80%]':'w-[90%]'} h-screen text-sm flex bg-black-100`}>
       {selectedChannel !== null && selectedChannel !== undefined && selectedServer !== undefined && selectedServer.channels != null? (
         <div className='flex flex-col justify-between relative w-full'>
           <ul ref={chatAreaRef} className='overflow-auto'>
@@ -78,7 +80,11 @@ const ChatBox = (params) => {
               <input type="text" value={message} onChange={(event) => setMessage(event.target.value)} className=' bg-black-50 border-0 text-sm focus:ring-0 p-1 focus:outline-none overflow-auto w-full text-white truncate' placeholder={`${selectedChannel.name} kanalına mesaj gönder`} />
             </form>
         </div>
-      ) : <div className='flex flex-col justify-center items-center w-full h-full'></div>}
+      ) : 
+      <div className='flex flex-col justify-center items-center w-full h-full text-gray-200 gap-5'>
+        <img src={img} alt="" className='w-64'/>
+        There is noting here...
+      </div>}
     </div>
   );
 }

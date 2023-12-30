@@ -43,7 +43,7 @@ function createChannel(){
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center text-white bg-[#000000] bg-opacity-60" onClick={() => setPopup({...popup, createChannel: false, showPopup: false})}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center text-white " onClick={() => setPopup({...popup, createChannel: false, showPopup: false})}>
         <div className="relative bg-[#313338] rounded-md shadow-md mx-5" onClick={(e) => e.stopPropagation()}>
           <div className="text-center sm:w-96">
               <div className='p-4 flex flex-col gap-5 text-left'>

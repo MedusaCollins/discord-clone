@@ -4,7 +4,8 @@ const UserSchema = new mongoose.Schema({
   name: String,
   email: String,
   imageUrl: String,
-  roles: [String]
+  roles: [String],
+  status: String
 });
 
 const MessageSchema = new mongoose.Schema({

@@ -231,7 +231,6 @@ io.on("connection", (socket) => {
       await Serverdb.findByIdAndUpdate(server._id, { $set: { channels: server.channels } }, { new: true});
       io.emit("getMessage", {server: server});
     });
-
     socket.on("createChannel", async (data) => {
       data.server.channels.push(data.channel);
       // console.log(data.server.channels)

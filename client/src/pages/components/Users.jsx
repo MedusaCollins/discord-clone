@@ -7,7 +7,7 @@ const Users = (params) => {
   };
 
   return (
-    <div className="w-[10%] h-screen bg-black-200 ">
+    <div className={`${selected.serverID !== null && selectedServer !== "" ? 'w-[10%]':null} h-screen bg-black-200`}>
       {selected.serverID !== null && selectedServer !== "" ? selectedServer.serverRoles.map((roles, index) => (
         selectedServer.serverUsers.some(user => user.roles[0] === roles.name) ? (
           <div key={index} className='text-sm mt-5'>

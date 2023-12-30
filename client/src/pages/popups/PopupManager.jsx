@@ -4,8 +4,9 @@ import ChannelSettings from './menus/ChannelSettings'
 import CreateChannel from './CreateChannel'
 import ServerInvite from './ServerInvite'
 import UserBan from './UserBan'
+import CreateServer from './CreateServer'
 
-const PopupManager = ({input, setInput, selected, selectedServer, popup, setPopup, access}) => {
+const PopupManager = ({input, setInput, selected, selectedServer, popup, setPopup, access, user, data, setData}) => {
   const [filterMenu, setFilterMenu] = useState({
     userPopup: false,
     banPopup: false,
@@ -19,14 +20,15 @@ const PopupManager = ({input, setInput, selected, selectedServer, popup, setPopu
         <div className="text-center sm:w-96">
           {/* ServerSettings menüsüne gerekli params değerlerini taşımamız gerekli */}
           {selectedServer.channels !== undefined && selectedServer.channels !== null ?(
-            <div>
+            <>
               {popup.serverSettings && (<ServerSettings selected={selected} input={input} setInput={setInput} selectedServer={selectedServer} setPopup={setPopup} popup={popup} filterMenu={filterMenu} setFilterMenu={setFilterMenu}/>)}
               {popup.serverInvite && (<ServerInvite selected={selected} input={input} setInput={setInput} selectedServer={selectedServer} setPopup={setPopup} popup={popup} access={access}/>)}
               {filterMenu.banPopup && (<UserBan selected={selected} input={input} setInput={setInput} selectedServer={selectedServer} setPopup={setPopup} popup={popup} filterMenu={filterMenu} setFilterMenu={setFilterMenu}/>)}
               {popup.createChannel && (<CreateChannel selected={selected} input={input} setInput={setInput} selectedServer={selectedServer} setPopup={setPopup} popup={popup} access={access}/>)}
               {popup.channelSettings && (<ChannelSettings selected={selected} input={input} setInput={setInput} selectedServer={selectedServer} setPopup={setPopup} popup={popup}/>)}
-            </div>
+            </>
           ):null}
+          {popup.createServer && (<CreateServer selected={selected} input={input} setInput={setInput} selectedServer={selectedServer} setPopup={setPopup} popup={popup} access={access} user={user} data={data} setData={setData}/>)}
         </div>
       </div>
     </div>
