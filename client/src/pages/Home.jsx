@@ -7,6 +7,7 @@ import Users from "./components/Users";
 
 import axios from "axios";
 import { io } from "socket.io-client";
+import PopupManager from "./popups/PopupManager";
 
 export default function Home(params) {
     const [selected, setSelected] = useState({
@@ -14,17 +15,26 @@ export default function Home(params) {
         channelID: null,
     });
     const [popup, setPopup] = useState({
+        showPopup: false,
         serverInfo: false,
         serverSettings: false,
-        channelSettings: true,
+        channelSettings: false,
         channelInfo:{},
-        invite: false,
+        serverInvite: false,
         leave: false,
         createChannel: false,
       })
 
     const [server, setServer] = useState([{}]);
     const user= params.user;
+
+    const [input, setInput] = useState({
+        serverName: server.name,
+        searchMembers: "",
+        searchUserId: "",
+        channelType: "",
+        channelName: "",
+      });
     const [data, setData] = useState([])
     const [socket, setSocket] = useState(null);
 
@@ -45,6 +55,7 @@ export default function Home(params) {
     useEffect(() => {
         const socket = io(process.env.REACT_APP_SERVER);
         setSocket(socket);
+        // ServerUpdate diye bir event oluşturduk ve /getServer ile refresh atılması sağlanacak.
         socket.on("joinServer", (data) => {
             if(data.serverID === selected.serverID){
                 axios.post(`${process.env.REACT_APP_SERVER}/getServer`, { serverID: selected.serverID}).then(res => {
@@ -92,8 +103,9 @@ export default function Home(params) {
 
     return(
         <div className="flex">
+            <PopupManager input={input} setInput={setInput} selected={selected} selectedServer={server} popup={popup} setPopup={setPopup} access={access}/>
             <ServerSelect selected={selected} setSelected={setSelected} user={user} data={data} setData={setData}/>
-            <Channels selected={selected} setSelected={setSelected} setData={setData} selectedServer={server} user={user} setLogin={params.setLogin} popup={popup} setPopup={setPopup} access={access}/>
+            <Channels input={input} setInput={setInput} selected={selected} setSelected={setSelected} setData={setData} selectedServer={server} user={user} setLogin={params.setLogin} popup={popup} setPopup={setPopup} access={access}/>
             <ChatBox selected={selected} selectedServer={server} setServer={setServer} user={user} access={access}/>
             <Users selected={selected} selectedServer={server}/>
         </div>
