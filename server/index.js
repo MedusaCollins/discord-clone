@@ -249,6 +249,14 @@ io.on("connection", (socket) => {
     socket.on("leaveServer", async (server) => {
       io.emit("leaveServer", {serverID: server.serverID});
     })
+    socket.on("deleteServer", async (server) => {
+      try {
+        await Serverdb.findByIdAndDelete(server.serverID);
+        io.emit("deleteServer", { serverID: server.serverID });
+      } catch (error) {
+        console.error("Error deleting server:", error);
+      }
+    });
   } catch (error) {
     console.error("Login error:", error);
   }

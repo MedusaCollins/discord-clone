@@ -64,6 +64,7 @@ export default function Home(params) {
         })
     }
     function serversUpdate(){
+        setSelected({serverID: null, channelID: null})
         axios.post(`${process.env.REACT_APP_SERVER}/listServers`, { user: params.user })
           .then(res => {
             setData(res.data);
@@ -85,9 +86,8 @@ export default function Home(params) {
                 serverUpdate()
             }
         })
-        socket.on("createDM", (data)=>{
+        socket.on("deleteServer", (data) => {
             serversUpdate()
-            // console.log(data.server)
         })
         socket.on("channelUpdate", (data) => {
             if(data.server._id === selected.serverID){
