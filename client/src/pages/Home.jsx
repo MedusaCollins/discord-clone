@@ -13,7 +13,7 @@ export default function Home(params) {
     const [selected, setSelected] = useState({
         serverID: null,
         channelID: null,
-    });
+    });    
     const [popup, setPopup] = useState({
         showPopup: false,
         serverInfo: false,
