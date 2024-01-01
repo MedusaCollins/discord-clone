@@ -210,10 +210,12 @@ io.on("connection", (socket) => {
   try {  
     socket.on("sendMessage", async (msg) => {
       try {
+        console.log(msg)
         const server = await Serverdb.findOne({ "channels._id": msg.channelID });
         const channel = server.channels.find(channel => channel._id == msg.channelID);
         const message={
-          message: msg.text,
+          messageType: msg.messageType,
+          message: msg.message,
           user: msg.user,
         }
 
@@ -233,7 +235,6 @@ io.on("connection", (socket) => {
     });
     socket.on("createChannel", async (data) => {
       data.server.channels.push(data.channel);
-      // console.log(data.server.channels)
       await Serverdb.findByIdAndUpdate(data.server._id, { $set: {channels: data.server.channels} }, { new: true});
       io.emit("channelUpdate", {server: data.server});
     })
@@ -242,8 +243,7 @@ io.on("connection", (socket) => {
       await Serverdb.findByIdAndUpdate(data.server._id, { $set: {channels: data.server.channels} }, { new: true});
       io.emit("channelUpdate", {server: data.server});
     })
-
-    socket.on("joinServer", async (server) => {
+    socket.on("joinServer", async (data) => {
       io.emit("joinServer", {serverID: server.serverID});
     })
     socket.on("leaveServer", async (server) => {

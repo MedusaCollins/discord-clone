@@ -4,7 +4,7 @@ import { io } from 'socket.io-client'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronRight} from '@fortawesome/free-solid-svg-icons'
 
-const CreateServer = ({input, setInput, popup, setPopup, data, setData, user}) => {
+const CreateServer = ({input, setInput, popup, setPopup, data, setData, user, selectedServer}) => {
 
     const [socket, setSocket] = useState(null);
     useEffect(() => {
@@ -29,12 +29,13 @@ const CreateServer = ({input, setInput, popup, setPopup, data, setData, user}) =
         setInput('');
         try {
           const res = await axios.post(`${process.env.REACT_APP_SERVER}/joinServer`, { serverID: input.joinServer, user: user });
-          console.log(res.data)
           if(res.data.Error){
             setInput({...input, errorHandler: res.data.Error})
           }
           else{
-            socket.emit('joinServer', {serverID: input.joinServer})
+            let serverUser = res.data.serverUsers.find(u => u.name === user.name)
+            socket.emit("sendMessage", { serverID: res.data._id, channelID: res.data.channels[0]._id, messageType: 'joinServer', message: 'just slid into the server.', user: serverUser });
+            socket.emit('joinServer', {serverID: input.joinServer, user: user})
             setData([...data, res.data]);
             setInput('');
             setPopup({...popup, joinServer: false, createServer:false, showPopup: false, section: 1});

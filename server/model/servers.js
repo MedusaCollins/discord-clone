@@ -9,6 +9,7 @@ const UserSchema = new mongoose.Schema({
 });
 
 const MessageSchema = new mongoose.Schema({
+  messageType: String,
   message: String,
   user: UserSchema
 });

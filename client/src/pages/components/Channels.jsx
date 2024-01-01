@@ -19,6 +19,7 @@ const Channels = ({selected, selectedServer, setLogin, setSelected, data,setData
   async function leaveServer() {
     selectedServer.serverUsers.map((selectedUser) => {
       if (selectedUser.email === user.email) {
+        socket.emit("sendMessage", { serverID: selectedServer._id, channelID: selectedServer.channels[0]._id, messageType: 'leaveServer', message: 'just left the server.', user: selectedUser });
         axios.post(`${process.env.REACT_APP_SERVER}/leaveServer`, { serverID: selectedServer._id, user: selectedUser }).then((res) => {
           setData(res.data);
           setSelected({ serverID: null, channelID: null });
