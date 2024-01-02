@@ -42,27 +42,32 @@ mongoose.connect(`${process.env.DB}`)
 
 
 app.post("/joinServer", async (req, res) => {
-  const user = {
-    name: req.body.user.name,
-    email: req.body.user.email,
-    imageUrl: req.body.user.imageUrl,
-    roles: ["Guest"]
-  }
-  try {
-    const server = await Serverdb.findOne({ 'serverUsers.email': req.body.user.email, '_id': req.body.serverID });
-    if(server){
-      res.send({'Error': 'You are already in this server.'});
-    }else{
-      const isServer = await Serverdb.findOne({ '_id': req.body.serverID });
-      if(isServer){
-        const server = await Serverdb.findByIdAndUpdate(req.body.serverID, { $push: { serverUsers: user } }, { new: true });
-        res.send(server)
-      }else{
-        res.send({'Error': 'This server does not exist.'});
-      }
+  if (!mongoose.Types.ObjectId.isValid(req.body.serverID)) {
+    return res.send({ 'Error': 'Invalid server ID.' });
+  }else{
+    const user = {
+      name: req.body.user.name,
+      email: req.body.user.email,
+      imageUrl: req.body.user.imageUrl,
+      roles: ["Guest"]
     }
-  } catch (error) {
-    console.error("Login error:", error);
+    try {
+      const server = await Serverdb.findOne({ 'serverUsers.email': req.body.user.email, '_id': new mongoose.Types.ObjectId(req.body.serverID) });
+      if(server){
+        res.send({'Error': 'You are already in this server.'});
+      }else{
+        const isServer = await Serverdb.findById(req.body.serverID);
+        if(isServer){
+          const server = await Serverdb.findByIdAndUpdate(req.body.serverID, { $push: { serverUsers: user } }, { new: true });
+          console.log("test")
+          res.send(server)
+        }else{
+          res.send({'Error': 'This server does not exist.'});
+        }
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+    }
   }
 });
 

@@ -85,7 +85,7 @@ const CreateServer = ({input, setInput, popup, setPopup, data, setData, user, se
                         INVITE LINK <span className='text-red-500'>*</span>
                       </label>
                       <div className="my-2">
-                        <input value={input.joinServer} onChange={(e) => setInput({...input, joinServer:e.target.value})} type="text" required
+                        <input value={input.joinServer || ''} onChange={(e) => setInput({...input, joinServer:e.target.value})} type="text" required
                         className="w-full px-2 py-2 text-sm rounded-sm bg-[#1E1F22] text-gray-300 border-0 ring-0 outline-none resize-none" />
                         <p className='text-sm text-red-500 right-5 mt-1 absolute'>{input.errorHandler}</p>
                       </div>
@@ -114,7 +114,7 @@ const CreateServer = ({input, setInput, popup, setPopup, data, setData, user, se
                         SERVER NAME
                       </label>
                       <div className="my-2">
-                        <input value={input.createServer} onChange={(e) => setInput({...input, createServer:e.target.value})} type="text" required
+                        <input value={input.createServer || ''} onChange={(e) => setInput({...input, createServer:e.target.value})} type="text" required
                         className="w-full px-2 py-2 text-sm rounded-sm bg-[#1E1F22] text-gray-300 border-0 ring-0 outline-none resize-none" />
                       </div>
                     </div>
