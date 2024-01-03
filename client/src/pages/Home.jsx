@@ -37,6 +37,9 @@ export default function Home(params) {
         searchUserId: "",
         channelType: "",
         channelName: "",
+        roleName: "",
+        roleColor: "",
+        roleAccess: "",
         createServer: `${user.name}'s Server`,
         joinServer: '',
         errorHandler: ''

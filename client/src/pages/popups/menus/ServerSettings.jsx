@@ -1,13 +1,15 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faX, faUser, faChevronRight, faChevronDown, faUserGroup, faMagnifyingGlass, faShieldHalved, faEllipsis, faCircleCheck, faGavel } from '@fortawesome/free-solid-svg-icons'
+import { faChevronDown, faUserGroup, faMagnifyingGlass, faCircleCheck, faGavel, faCircle, faEyeDropper, faXmark, faCheck, faXmarkCircle } from '@fortawesome/free-solid-svg-icons'
 import { faCircleXmark } from '@fortawesome/free-regular-svg-icons'
 
 const ServerSettings = (
     {selectedServer, setPopup, popup, input, setInput, selected, filterMenu, setFilterMenu }
 ) => {
   const [currentStep, setCurrentStep] = useState(0);
+  const [selectedRole, setSelectedRole] = useState(null);
+  const [selectedPage, setSelectedPage] = useState(0);
   const serverSettings = [
     "Overview",
     "Roles",
@@ -16,7 +18,24 @@ const ServerSettings = (
     "Bans"
   ];
   const [selectedChannel, setSelectedChannel] = useState(selected.channelID)
+  const permissions = [
+    { name: "Manage Server", key: "manageServer", description: "Allows members to delete messages by other members." },
+    { name: "Manage Channels", key: "manageChannels", description: "Allows members to create, edit or delete channels." },
+    { name: "Manage Roles", key: "manageRoles", description: "Allows members to create new roles and edit or delete roles lower than their highest role. Also allows members to change permissions of individual channels that they have access to." },
+    { name: "Manage Members", key: "manageUsers", description: "Allows members to remove other members from this server." },
+    { name: "Manage Messages", key: "manageMessages", description: "Allows members to delete messages by other members." },
+    { name: "Manage Voice", key: "manageVoice", description: "Allows members to mute/deafen/move/disconnect other members in voice channels." },
+    { name: "Create Expressions", key: "manageEmojis", description: "Allows members to add custom emoji in this server." },
 
+  ];
+
+  function selectRole(role){
+    setSelectedRole(role)
+    setInput({...input, roleName: role.name, roleColor: role.color, roleAccess: role.access})
+  }
+  useEffect(() => {
+    selectRole(selectedServer.serverRoles[0])
+  },[selectedServer])
   const showSettingsMenu = () => {
     switch (serverSettings[currentStep]) {
       case "Overview":
@@ -66,52 +85,90 @@ const ServerSettings = (
         </div>)
       case "Roles":
         return (
-          <div className='w-[500px] space-y-3'>
-            <p className='font-bold'>Roles</p>
-            <p className='text-ssm text-gray-100'>Use roles to group your server members and assign permissions.</p>
-
-            <button className='w-full bg-[#2B2D31] hover:bg-black-50 group rounded-md p-2 pr-5 items-center flex justify-between'>
-            <div className='col-span-3 space-x-3 flex'>
-              <div className='items-center flex'>
-                  <FontAwesomeIcon icon={faUserGroup} className='bg-black-100 text-gray-100 group-hover:text-white p-2 rounded-full items-center justify-center flex text-ssm' />
-              </div>
-              <div className="text-sm text-left">
-                <p className='text-gray-100 font-bold'>Default Permissions</p>
-                <p className='text-gray-200 text-ssm font-medium'>@everyone - applies to all server members</p>
-              </div>
+          <div className='w-[500px] grid grid-cols-7'>
+            <div className='col-span-2 border-r border-[#46484b] px-1.5'>{selectedServer.serverRoles.map((role, index) => (
+              <button key={index} onClick={() => selectRole(role)} className={`${selectedRole !==null && selectedRole !==undefined && selectedRole.name === role.name ? 'bg-black-focus':'hover:bg-black-hover'} rounded-md px-2 py-1 my-0.5 text-sm gap-2 flex items-center w-full`}><FontAwesomeIcon icon={faCircle} className='w-3' style={{color: role.color}}/>{role.name}</button>
+            ))}
             </div>
-              <FontAwesomeIcon icon={faChevronRight} className='text-sm text-gray-100 font-thin col-span-1'/>
-            </button>
-
-            <div className='flex items-center'>
-              <div className='items-center flex w-full'>
-                <input value={input.serverName} type="text" onChange={(e) => setInput({...input, serverName:e.target.value})}
-                  className="w-full px-2 py-2 text-sm rounded-l-sm bg-[#1E1F22] text-gray-300 border-0 ring-0 outline-none resize-none"/>
-                <FontAwesomeIcon icon={faMagnifyingGlass} className='text-gray-100 bg-[#1E1F22] py-2.5 px-2 rounded-r-sm'/>
-              </div>
-              <button className='bg-blue-50 hover:bg-blue-200 px-3 py-2 text-ssm w-24 rounded-sm'>Create Role</button>
-            </div>
-            <p className='text-ssm text-gray-100'>Members use the color of the highest role they have on this list. Drag roles to reorder them.</p>
-
-            <div>
-              <div className='grid grid-cols-2 w-full border-b border-[#46484b] pb-2'>
-                <p className='text-ssm font-bold text-gray-100'>ROLES - {selectedServer.serverRoles.length}</p>
-                <p className='text-ssm font-bold text-gray-100'>MEMBERS</p>
-              </div>
-              {selectedServer.serverRoles.map((role, index) => (
-                <div key={index} className='grid grid-cols-2 group w-full border-b border-[#46484b] hover:bg-black-50 py-2'>
-                  <div className='flex items-center mx-5 space-x-2'>
-                  <FontAwesomeIcon icon={faShieldHalved} style={{color: role.color}}/>
-                  <p className='text-ssm text-gray-100'>{role.name}</p>
-                  </div>
-                  <div className="text-gray-100 text-sm pl-5 flex items-center justify-between">
-                    <p>
-                    {selectedServer.serverUsers.filter((user) => user.roles[0] === role.name).length} <FontAwesomeIcon icon={faUser}/>
-                    </p>
-                    <button className="bg-black-200 group-hover:bg-black-400 transition-all px-2 py-1 mx-2 rounded-full"><FontAwesomeIcon icon={faEllipsis} /></button>
-                  </div>
+              <div className='col-span-5 pl-5'>
+              {selectedRole !== null && selectedRole !== undefined ? (
+                <>
+                <h1>Edit Role - {selectedRole.name}</h1>
+                <div className='flex items-center gap-5 border-b my-5 border-[#46484b]'>
+                  <button onClick={() => setSelectedPage(0)} className={`${selectedPage===0?' border-[#949CF7]':'hover:border-[#5865F2] border-black-100 hover:text-gray-100 text-gray-200'} border-b-2 pb-2`}>Display</button>
+                  <button onClick={() => setSelectedPage(1)} className={`${selectedPage===1?' border-[#949CF7]':'hover:border-[#5865F2] border-black-100 hover:text-gray-100 text-gray-200'} border-b-2 pb-2`}>Permission</button>
+                  <button onClick={() => setSelectedPage(2)} className={`${selectedPage===2?' border-[#949CF7]':'hover:border-[#5865F2] border-black-100 hover:text-gray-100 text-gray-200'} border-b-2 pb-2`}>Manage Member</button>
                 </div>
-              ))}
+                <div>
+                {selectedPage === 0 && (
+                  <div>
+                    <label htmlFor="Change Role Name" className="block text-ssm font-bold leading-6 text-gray-100">
+                      ROLE NAME <span className='text-red-500'>*</span>
+                    </label>
+                    <input value={input.roleName} type="text" onChange={(e) => setInput({...input, roleName:e.target.value})}
+                    className="w-full px-2 py-2 text-sm rounded-sm bg-[#1E1F22] text-gray-300 border-0 ring-0 outline-none resize-none" />
+                    <div className='border-t border-[#46484b] my-5'></div>
+                    <label htmlFor="Change Role Color" className="block text-ssm font-bold leading-6 text-gray-100 -space-y-1 mb-2">
+                      ROLE COLOR <span className='text-red-500'>*</span>
+                      <p className='font-normal'>Members use the color of the highest role they have on the roles List.</p>
+                    </label>
+                    <div className='flex items-center gap-2'>
+                      <button className='w-14 h-12 relative rounded-md border border-[#46484b]' style={{backgroundColor: input.roleColor}}><FontAwesomeIcon icon={faEyeDropper} className='absolute right-2 top-2 text-sm'/></button>
+
+                      <div className='grid grid-cols-10 grid-rows-2 gap-2'>
+                        {['#2dd4bf', '#34d399', '#60a5fa', '#c084fc', '#f472b6', '#facc15', '#fb923c', '#f87171', '#9ca3af', '#94a3b8',
+                          '#0d9488', '#059669', '#2563eb', '#9333ea', '#db2777', '#ca8a04', '#ea580c', '#dc2626', '#4b5563', '#475569'].map((color, index) => (
+                            <button key={index} className={`w-5 h-5 relative rounded-md`} style={{backgroundColor: `${color}`}}
+                              onClick={() => {
+                                console.log(`Color: ${color}`);
+                              }}></button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {selectedPage === 1 && (
+                  <div>
+                    <ul>
+                      {permissions.map((permission, index) => (
+                        <li key={index} className='border-b border-[#46484b] pb-5 my-3'>
+                          <div className='flex items-center justify-between my-2'>
+                            <p className='text-sm text-white'>{permission.name}</p>
+                            <div onClick={() => setInput({...input, roleAccess:{...input.roleAccess, [permission.key]: !input.roleAccess[permission.key]}})} 
+                              className={`cursor-pointer h-6 w-10 rounded-full p-1 ring-1 ring-inset duration-200 transition ease-in-out ${input.roleAccess[permission.key] ? 'bg-indigo-600 ring-black/20' : 'bg-[#80848E] ring-slate-900/5'}`}>
+                              <div className={`h-4 w-4 rounded-full bg-white shadow-sm ring-1 ring-slate-700/10 text-[#80848E] justify-center items-center flex transition duration-200 ease-in-out ${input.roleAccess[permission.key] && 'translate-x-4'}`}>
+                                <FontAwesomeIcon icon={input.roleAccess[permission.key] ? faCheck : faXmark} className='text-ssm'/>
+                              </div>
+                            </div>
+                          </div>
+                          <p className='text-ssm text-gray-100'>{permission.description}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {selectedPage === 2 && (
+                  <div>
+                    <button className='bg-blue-50 hover:bg-blue-200 px-3 py-2 mb-5 text-ssm rounded-sm w-full transition-all'>Add Members</button>
+                    <div className='flex flex-col'>
+                      {selectedServer.serverUsers.map((user, index) => {
+                        if(user.roles[0] === selectedRole.name) {
+                          return (
+                            <div key={index} className='flex justify-between p-2 rounded-md hover:bg-black-50'>
+                              <div className='flex gap-2'>
+                                <img src={user.imageUrl} alt="user" className='w-6 h-6 rounded-full'/>{user.name}
+                              </div>
+                              <button><FontAwesomeIcon icon={faXmarkCircle} className='text-gray-200 hover:text-gray-100'/></button>
+                            </div>
+                          );
+                        }
+                      })}
+                    </div>
+                  </div>
+                )}
+                </div>
+                </>
+              ):(<p className='text-gray-100'>There is no role.</p>)}
             </div>
           </div>)
       case "Emoji":
@@ -150,7 +207,7 @@ const ServerSettings = (
                   <p className='text-ssm text-gray-100 -mt-1'>username</p>
                 </div>
               </div>
-              <button className='text-red-500 border border-black-400 rounded-full hidden  w-5 h-5 text-ssm group-hover:flex -mt-5 items-center justify-center'><FontAwesomeIcon icon={faX}/></button>
+              <button className='text-red-500 border border-black-400 rounded-full hidden  w-5 h-5 text-ssm group-hover:flex -mt-5 items-center justify-center'><FontAwesomeIcon icon={faXmark}/></button>
             </div>
             
             
