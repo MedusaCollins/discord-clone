@@ -21,7 +21,7 @@ export default function Login(props) {
     return(
         <div>
             <img src={process.env.REACT_APP_IMG} alt="" />
-            <h1 className='text-white font-bold text-2xl mb-6'>{`Welcome to ${process.env.REACT_APP_NAME}`}</h1>
+            <h1 className='text-black-50 font-bold text-2xl mb-6'>{`Welcome to ${process.env.REACT_APP_NAME}`}</h1>
         <GoogleLogin
         theme='filled_blue'
         shape='circle'

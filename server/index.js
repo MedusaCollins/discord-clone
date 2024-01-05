@@ -262,6 +262,24 @@ io.on("connection", (socket) => {
         console.error("Error deleting server:", error);
       }
     });
+    socket.on("updateServer", async (data) => {
+      try {
+        const server = await Serverdb.findByIdAndUpdate(data.serverID, { $set: {name: data.serverName} }, { new: true});
+        // const updatedRoles = server.serverRoles.map(role => {
+        //   if (role._id == data.roleID) {
+        //     console.log(data)
+        //     return { ...role, name: data.roleName, access: data.roleAccess };
+        //   } else {
+        //     return role;
+        //   }
+        // });
+        // server.serverRoles = updatedRoles;
+        // await server.save();
+        io.emit("updateServer", { server: server });
+      } catch (error) {
+        console.error("Error updating server:", error);
+      }
+    });
   } catch (error) {
     console.error("Login error:", error);
   }

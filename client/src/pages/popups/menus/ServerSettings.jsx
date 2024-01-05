@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-
+import { io } from 'socket.io-client'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronDown, faUserGroup, faMagnifyingGlass, faCircleCheck, faGavel, faCircle, faEyeDropper, faXmark, faCheck, faXmarkCircle } from '@fortawesome/free-solid-svg-icons'
 import { faCircleXmark } from '@fortawesome/free-regular-svg-icons'
@@ -7,9 +7,19 @@ import { faCircleXmark } from '@fortawesome/free-regular-svg-icons'
 const ServerSettings = (
     {selectedServer, setPopup, popup, input, setInput, selected, filterMenu, setFilterMenu }
 ) => {
+  const [socket, setSocket] = useState(null);
+  useEffect(() => {
+    const socket = io(process.env.REACT_APP_SERVER);
+    setSocket(socket);
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [selectedServer]);
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedRole, setSelectedRole] = useState(null);
   const [selectedPage, setSelectedPage] = useState(0);
+  const [unsavedChanges, setUnsavedChanges] = useState(false)
   const serverSettings = [
     "Overview",
     "Roles",
@@ -36,6 +46,26 @@ const ServerSettings = (
   useEffect(() => {
     selectRole(selectedServer.serverRoles[0])
   },[selectedServer])
+
+  useEffect(()=> {
+      if(input.serverName !== selectedServer.name){
+        setUnsavedChanges(true)
+      }else{
+        setUnsavedChanges(false)
+      }
+  },[input])
+
+
+  const saveChanges = (e) => {
+    e.preventDefault();
+    socket.emit("updateServer", { serverID: selectedServer._id, serverName: input.serverName})
+    // setInput({...input, serverName: input.serverName, roleName: input.roleName, roleColor: input.roleColor, roleAccess: input.roleAccess})
+    // selectRole({name: input.roleName, color: input.roleColor, access: input.roleAccess, _id: selectedRole._id})
+    }
+    const resetChanges = (e) => {
+      e.preventDefault();
+      setInput({...input, serverName: selectedServer.name})
+    }
   const showSettingsMenu = () => {
     switch (serverSettings[currentStep]) {
       case "Overview":
@@ -302,6 +332,15 @@ const ServerSettings = (
         <div className='flex pt-5 ml-8 space-x-8'>
               {showSettingsMenu()}
             <button className="text-3xl text-gray-200 hover:text-gray-100 h-0" onClick={()=> setPopup({...popup, serverSettings: false, showPopup: false})}><FontAwesomeIcon icon={faCircleXmark} /></button>
+            {unsavedChanges && (
+              <div className='justify-between items-center flex bg-black-400 px-2 py-2 w-[600px] rounded-md fixed bottom-5'> 
+              <p className='text-sm text-gray-50'>Careful - you have unsaved changes!</p>
+              <div className='flex gap-5'>
+                <button type='text' onClick={resetChanges} className='px-3 py-1 text-sm text-gray-50 hover:underline'>Reset</button>
+                <button type='submit' onClick={saveChanges} className='px-3 py-1 text-sm bg-green-700 hover:bg-green-900 transition-all rounded-sm'>Save Changes</button>
+              </div>
+            </div>
+            )}
         </div>        
       </div> 
   )

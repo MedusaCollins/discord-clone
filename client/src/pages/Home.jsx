@@ -92,6 +92,9 @@ export default function Home(params) {
         socket.on("deleteServer", (data) => {
             serversUpdate()
         })
+        socket.on("updateServer", (data)=> {
+            serverUpdate()
+        })
         socket.on("channelUpdate", (data) => {
             if(data.server._id === selected.serverID){
                 setServer(data.server);
