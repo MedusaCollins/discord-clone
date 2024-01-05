@@ -94,6 +94,13 @@ export default function Home(params) {
         })
         socket.on("updateServer", (data)=> {
             serverUpdate()
+            console.log(popup)
+            if(popup.serverSettings){
+                setPopup({...popup, showPopup:false})
+                serverUpdate()
+            }else{
+                serverUpdate()
+            }
         })
         socket.on("channelUpdate", (data) => {
             if(data.server._id === selected.serverID){

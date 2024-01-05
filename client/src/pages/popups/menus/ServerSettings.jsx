@@ -41,26 +41,28 @@ const ServerSettings = (
 
   function selectRole(role){
     setSelectedRole(role)
+    console.log(role)
     setInput({...input, roleName: role.name, roleColor: role.color, roleAccess: role.access})
   }
+
   useEffect(() => {
     selectRole(selectedServer.serverRoles[0])
-  },[selectedServer])
-
+  },[selectedServer, popup])
   useEffect(()=> {
-      if(input.serverName !== selectedServer.name){
+    if(selectedServer !== null && selectedServer !== undefined && selectedRole !== null && selectedRole !== undefined){
+
+      if(input.serverName !== selectedServer.name || input.roleName !== selectedRole.name || input.roleColor !== selectedRole.color || input.roleAccess !== selectedRole.access){
         setUnsavedChanges(true)
       }else{
         setUnsavedChanges(false)
       }
+    }
   },[input])
 
 
   const saveChanges = (e) => {
     e.preventDefault();
-    socket.emit("updateServer", { serverID: selectedServer._id, serverName: input.serverName})
-    // setInput({...input, serverName: input.serverName, roleName: input.roleName, roleColor: input.roleColor, roleAccess: input.roleAccess})
-    // selectRole({name: input.roleName, color: input.roleColor, access: input.roleAccess, _id: selectedRole._id})
+    socket.emit("updateServer", { serverID: selectedServer._id, serverName: input.serverName, roleID: selectedRole._id, roleName: input.roleName, roleColor: input.roleColor, roleAccess: input.roleAccess})
     }
     const resetChanges = (e) => {
       e.preventDefault();
@@ -150,7 +152,7 @@ const ServerSettings = (
                           '#0d9488', '#059669', '#2563eb', '#9333ea', '#db2777', '#ca8a04', '#ea580c', '#dc2626', '#4b5563', '#475569'].map((color, index) => (
                             <button key={index} className={`w-5 h-5 relative rounded-md`} style={{backgroundColor: `${color}`}}
                               onClick={() => {
-                                console.log(`Color: ${color}`);
+                                setInput({...input, roleColor: color})
                               }}></button>
                         ))}
                       </div>
@@ -198,7 +200,7 @@ const ServerSettings = (
                 )}
                 </div>
                 </>
-              ):(<p className='text-gray-100'>There is no role.</p>)}
+              ):null}
             </div>
           </div>)
       case "Emoji":

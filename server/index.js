@@ -265,16 +265,16 @@ io.on("connection", (socket) => {
     socket.on("updateServer", async (data) => {
       try {
         const server = await Serverdb.findByIdAndUpdate(data.serverID, { $set: {name: data.serverName} }, { new: true});
-        // const updatedRoles = server.serverRoles.map(role => {
-        //   if (role._id == data.roleID) {
-        //     console.log(data)
-        //     return { ...role, name: data.roleName, access: data.roleAccess };
-        //   } else {
-        //     return role;
-        //   }
-        // });
-        // server.serverRoles = updatedRoles;
-        // await server.save();
+        const updatedRoles = server.serverRoles.map(role => {
+          if (role._id == data.roleID) {
+            console.log(data)
+            return { ...role, name: data.roleName, access: data.roleAccess, color: data.roleColor };
+          } else {
+            return role;
+          }
+        });
+        server.serverRoles = updatedRoles;
+        await server.save();
         io.emit("updateServer", { server: server });
       } catch (error) {
         console.error("Error updating server:", error);
