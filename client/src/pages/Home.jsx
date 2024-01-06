@@ -64,6 +64,11 @@ export default function Home(params) {
     function serverUpdate(){
         axios.post(`${process.env.REACT_APP_SERVER}/getServer`, { serverID: selected.serverID}).then(res => {
             setServer(res.data);
+            if (selected.serverID !== undefined && selected.serverID !== null){
+                setAccess(checkUserRole(res.data, user).access)
+            }else{
+                setAccess(null)
+            }
         })
     }
     function serversUpdate(){
@@ -93,11 +98,10 @@ export default function Home(params) {
             serversUpdate()
         })
         socket.on("updateServer", (data)=> {
-            serverUpdate()
-            console.log(popup)
             if(popup.serverSettings){
-                setPopup({...popup, showPopup:false})
                 serverUpdate()
+                setPopup({...popup, showPopup:false})
+                
             }else{
                 serverUpdate()
             }

@@ -267,7 +267,24 @@ io.on("connection", (socket) => {
         const server = await Serverdb.findByIdAndUpdate(data.serverID, { $set: {name: data.serverName} }, { new: true});
         const updatedRoles = server.serverRoles.map(role => {
           if (role._id == data.roleID) {
-            console.log(data)
+            server.serverUsers.map(user => {
+              if (user.roles.includes(role.name)) {
+                user.roles = user.roles.filter(roleName => roleName != role.name);
+                user.roles.push(data.roleName);
+              }
+            });
+            server.channels.map(channel => {
+              channel.access.read = channel.access.read.filter(roleName => roleName != role.name);
+              channel.access.write = channel.access.write.filter(roleName => roleName != role.name);
+              channel.access.read.push(data.roleName);
+              channel.access.write.push(data.roleName);
+              channel.messages.map(message => {
+                if (message.user.roles.includes(role.name)) {
+                  message.user.roles = message.user.roles.filter(roleName => roleName != role.name);
+                  message.user.roles.push(data.roleName);
+                }
+              });
+            });
             return { ...role, name: data.roleName, access: data.roleAccess, color: data.roleColor };
           } else {
             return role;

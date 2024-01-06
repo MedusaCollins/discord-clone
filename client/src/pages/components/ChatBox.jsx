@@ -27,6 +27,10 @@ const ChatBox = (params) => {
         setServer(data.server)
       }
     });
+    socket.on("updateServer", (data)=> {
+        setServer(data.server);
+        setSelectedChannel(data.server.channels.find(channel => channel._id === selected.channelID))
+    })
     return () => {
       socket.disconnect();
     };
@@ -74,9 +78,7 @@ const ChatBox = (params) => {
                       <div className='flex gap-2 items-center'>
                         {msg.messageType === 'joinServer' ? (
                         <FontAwesomeIcon icon={faArrowRightLong} className='text-green-600'/>
-                        ):(
-                        <FontAwesomeIcon icon={faArrowLeftLong} className='text-red-600'/>
-                        )}
+                        ):(<FontAwesomeIcon icon={faArrowLeftLong} className='text-red-600'/>)}
                         <p style={{ color: `${selectedServer.serverRoles && selectedServer.serverRoles.find(role => role.name === msg.user.roles[0]).color}` }}>{msg.user.name}</p>
                         <p className='text-gray-100 text-xs text-wrap break-words max-w-[1350px]'>{msg.message}</p>
                       </div>

@@ -41,7 +41,6 @@ const ServerSettings = (
 
   function selectRole(role){
     setSelectedRole(role)
-    console.log(role)
     setInput({...input, roleName: role.name, roleColor: role.color, roleAccess: role.access})
   }
 
@@ -63,10 +62,12 @@ const ServerSettings = (
   const saveChanges = (e) => {
     e.preventDefault();
     socket.emit("updateServer", { serverID: selectedServer._id, serverName: input.serverName, roleID: selectedRole._id, roleName: input.roleName, roleColor: input.roleColor, roleAccess: input.roleAccess})
+    setPopup({...popup, showPopup:false})
+    setSelectedPage(0)
     }
     const resetChanges = (e) => {
       e.preventDefault();
-      setInput({...input, serverName: selectedServer.name})
+      setInput({...input, serverName: selectedServer.name, roleName: selectedRole.name, roleColor: selectedRole.color, roleAccess: selectedRole.access})
     }
   const showSettingsMenu = () => {
     switch (serverSettings[currentStep]) {
