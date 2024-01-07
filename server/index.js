@@ -238,6 +238,18 @@ io.on("connection", (socket) => {
       await Serverdb.findByIdAndUpdate(server._id, { $set: { channels: server.channels } }, { new: true});
       io.emit("getMessage", {server: server});
     });
+    socket.on("addRole", async (data) => {
+      const server = await Serverdb.findById(data.serverID);
+      data.users.map(selectedUser => {
+        const serverUser = server.serverUsers.find(user => user.email == selectedUser);
+        serverUser.roles = [data.role]
+        console.log(serverUser)
+      })
+      await server.save();
+      io.emit("roleUpdate", {server: server});
+      
+      // console.log(user)
+    })
     socket.on("createChannel", async (data) => {
       data.server.channels.push(data.channel);
       await Serverdb.findByIdAndUpdate(data.server._id, { $set: {channels: data.server.channels} }, { new: true});

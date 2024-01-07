@@ -25,6 +25,7 @@ export default function Home(params) {
         createChannel: false,
         createServer: false,
         joinServer: false,
+        addMembers: false,
         section: 1
       })
 
@@ -32,18 +33,19 @@ export default function Home(params) {
     const user= params.user;
 
     const [input, setInput] = useState({
-        serverName: server.name,
-        searchMembers: "",
-        searchUserId: "",
-        channelType: "",
-        channelName: "",
-        roleName: "",
-        roleColor: "",
-        roleAccess: "",
-        createServer: `${user.name}'s Server`,
-        joinServer: '',
-        errorHandler: ''
-      });
+            serverName: server.name,
+            searchMembers: "",
+            searchUserId: "",
+            channelType: "",
+            channelName: "",
+            roleName: "",
+            roleColor: "",
+            roleAccess: "",
+            addRole: [], // Initialize addRole as an empty array
+            createServer: `${user.name}'s Server`,
+            joinServer: '',
+            errorHandler: ''
+        });
     const [data, setData] = useState([])
     const [socket, setSocket] = useState(null);
 
@@ -106,6 +108,14 @@ export default function Home(params) {
                 serverUpdate()
             }
         })
+        socket.on("roleUpdate", (data) => {
+            if(data.server._id === selected.serverID){
+                if(popup.serverSettings){
+                    setPopup({...popup, showPopup:false, serverSettings: false, addMembers: false})
+                }
+                serverUpdate()
+            }
+        });
         socket.on("channelUpdate", (data) => {
             if(data.server._id === selected.serverID){
                 setServer(data.server);

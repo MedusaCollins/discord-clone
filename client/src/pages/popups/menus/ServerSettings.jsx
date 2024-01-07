@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { io } from 'socket.io-client'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faChevronDown, faUserGroup, faMagnifyingGlass, faCircleCheck, faGavel, faCircle, faEyeDropper, faXmark, faCheck, faXmarkCircle } from '@fortawesome/free-solid-svg-icons'
+import { faChevronDown, faUserGroup, faMagnifyingGlass, faCircleCheck, faGavel, faCircle, faXmark, faCheck, faXmarkCircle } from '@fortawesome/free-solid-svg-icons'
 import { faCircleXmark } from '@fortawesome/free-regular-svg-icons'
 
 const ServerSettings = (
@@ -45,7 +45,9 @@ const ServerSettings = (
   }
 
   useEffect(() => {
-    selectRole(selectedServer.serverRoles[0])
+    if(selectedPage !== 2){
+      selectRole(selectedServer.serverRoles[0])
+    }
   },[selectedServer, popup])
   useEffect(()=> {
     if(selectedServer !== null && selectedServer !== undefined && selectedRole !== null && selectedRole !== undefined){
@@ -146,7 +148,7 @@ const ServerSettings = (
                       <p className='font-normal'>Members use the color of the highest role they have on the roles List.</p>
                     </label>
                     <div className='flex items-center gap-2'>
-                      <button className='w-14 h-12 relative rounded-md border border-[#46484b]' style={{backgroundColor: input.roleColor}}><FontAwesomeIcon icon={faEyeDropper} className='absolute right-2 top-2 text-sm'/></button>
+                      <button className='w-14 h-12 rounded-md border border-[#46484b]' style={{backgroundColor: input.roleColor}}></button>
 
                       <div className='grid grid-cols-10 grid-rows-2 gap-2'>
                         {['#2dd4bf', '#34d399', '#60a5fa', '#c084fc', '#f472b6', '#facc15', '#fb923c', '#f87171', '#9ca3af', '#94a3b8',
@@ -182,7 +184,7 @@ const ServerSettings = (
                 )}
                 {selectedPage === 2 && (
                   <div>
-                    <button className='bg-blue-50 hover:bg-blue-200 px-3 py-2 mb-5 text-ssm rounded-sm w-full transition-all'>Add Members</button>
+                    <button className='bg-blue-50 hover:bg-blue-200 px-3 py-2 mb-5 text-ssm rounded-sm w-full transition-all' onClick={() => setPopup({...popup, addMembers: true})}>Add Members</button>
                     <div className='flex flex-col'>
                       {selectedServer.serverUsers.map((user, index) => {
                         if(user.roles[0] === selectedRole.name) {
