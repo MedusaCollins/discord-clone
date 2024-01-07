@@ -239,6 +239,7 @@ io.on("connection", (socket) => {
       io.emit("getMessage", {server: server});
     });
     socket.on("addRole", async (data) => {
+      console.log(data)
       const server = await Serverdb.findById(data.serverID);
       data.users.map(selectedUser => {
         const serverUser = server.serverUsers.find(user => user.email == selectedUser);

@@ -60,7 +60,9 @@ const ServerSettings = (
     }
   },[input])
 
-
+  function removeRole(user){
+    socket.emit("addRole", {serverID: selectedServer._id, role: selectedServer.serverRoles[selectedServer.serverRoles.length-1].name, users: [user.email]})
+  }
   const saveChanges = (e) => {
     e.preventDefault();
     socket.emit("updateServer", { serverID: selectedServer._id, serverName: input.serverName, roleID: selectedRole._id, roleName: input.roleName, roleColor: input.roleColor, roleAccess: input.roleAccess})
@@ -193,7 +195,7 @@ const ServerSettings = (
                               <div className='flex gap-2'>
                                 <img src={user.imageUrl} alt="user" className='w-6 h-6 rounded-full'/>{user.name}
                               </div>
-                              <button><FontAwesomeIcon icon={faXmarkCircle} className='text-gray-200 hover:text-gray-100'/></button>
+                              <button onClick={()=> removeRole(user)}><FontAwesomeIcon icon={faXmarkCircle} className='text-gray-200 hover:text-gray-100'/></button>
                             </div>
                           );
                         }
