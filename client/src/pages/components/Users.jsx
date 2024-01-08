@@ -1,3 +1,5 @@
+import { faCrown } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 
 const Users = (params) => {
@@ -16,7 +18,7 @@ const Users = (params) => {
               user.roles[0] === roles.name ? (
                   <div key={index} className="flex items-center h-10 mt-1 pl-3 mx-2 rounded-md cursor-pointer bg-black-200 hover:bg-black-300">
                     <img className="w-7 h-7 rounded-full" src={user.imageUrl} alt="user" />
-                    <p className="ml-2 text-sm" style={{ color: `${roles.color}` }}>{user.name}</p>
+                    <p className="ml-2 text-sm" style={{ color: `${roles.color}` }}>{user.name} {selectedServer.owner === user.email && <FontAwesomeIcon icon={faCrown} className='text-orange-400'/>}</p>
                   </div>
               ) : null
             ))}

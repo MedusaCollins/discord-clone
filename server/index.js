@@ -90,6 +90,7 @@ app.post("/createServer", async (req, res) => {
     serverID: '01',
     name: req.body.serverName,
     image: req.body.user.imageUrl,
+    owner: req.body.user.email,
     channels: [
       {
         channelID: '01',
@@ -310,6 +311,19 @@ io.on("connection", (socket) => {
         console.error("Error updating server:", error);
       }
     });
+    socket.on("addLog", async(data)=>{
+      // console.log(data)
+      const server = await Serverdb.findById(data.serverID);
+      var logMessage = {
+        type: data.type,
+        byWhom: data.user,
+        toWho: data.messageOwner,
+        channel: data.channelName,
+      }
+      server.logs.push(logMessage);
+      await server.save();
+      io.emit("updateServer", {server: server});
+    })
   } catch (error) {
     console.error("Login error:", error);
   }

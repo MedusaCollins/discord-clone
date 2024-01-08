@@ -43,13 +43,21 @@ const RoleSchema = new mongoose.Schema({
   access: RoleAccessSchema
 });
 
+const logSchema = new mongoose.Schema({
+  type: String,
+  byWhom: UserSchema,
+  toWho: String,
+  channel: String,
+});
 const ServerSchema = new mongoose.Schema({
   serverID: String,
   name: String,
   image: String,
-  channels: [ChannelSchema],
+  owner: String,
+  logs: [logSchema],
   serverUsers: [UserSchema],
-  serverRoles: [RoleSchema]
+  serverRoles: [RoleSchema],
+  channels: [ChannelSchema],
 });
 
 const Serverdb = mongoose.model('Server', ServerSchema);

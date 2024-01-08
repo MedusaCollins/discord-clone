@@ -110,9 +110,7 @@ export default function Home(params) {
         })
         socket.on("roleUpdate", (data) => {
             if(data.server._id === selected.serverID){
-                if(popup.serverSettings){
-                    setPopup({...popup, showPopup:false, serverSettings: false, addMembers: false})
-                }
+                setPopup({...popup, showPopup:false, serverSettings: false, addMembers: false})
                 serverUpdate()
             }
         });

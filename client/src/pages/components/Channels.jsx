@@ -43,11 +43,15 @@ const Channels = ({selected, selectedServer, setLogin, setSelected, data,setData
             <div className='bg-black-400 absolute w-[90%] m-2 rounded-md'>
               <ul className='p-2'>
                 <li onClick={()=> setPopup({...popup, serverInvite:true,serverInfo:false, showPopup:true})} className="hover:bg-blue-50 cursor-pointer text-blue-50 hover:text-white p-1 px-2 text-sm justify-between flex items-center rounded-sm">Invite People <FontAwesomeIcon icon={faUserPlus} /></li>
-                <li className='border-b-2 border-[#2e2f31] my-1'></li>
-                <li onClick={()=> setPopup({...popup, serverSettings:true, serverInfo:false, showPopup: true})} className="hover:bg-blue cursor-pointer text-gray-100 hover:text-white hover:bg-blue-50 p-1 px-2 text-sm justify-between flex items-center rounded-sm">Server Settings <FontAwesomeIcon icon={faGear} /></li>
-                {access.manageChannels && <li onClick={()=> setPopup({...popup, createChannel:true, serverInfo:false, showPopup: true})} className="hover:bg-blue cursor-pointer text-gray-100 hover:text-white hover:bg-blue-50 p-1 px-2 text-sm justify-between flex items-center rounded-sm">Create Channel <FontAwesomeIcon icon={faPlus} /></li>}
-                <li className='border-b-2 border-[#2e2f31] my-1'></li>
-                {access.manageServer ? <li onClick={()=> deleteServer()} className="hover:bg-red-500 cursor-pointer text-red-500 hover:text-white p-1 px-2 text-sm justify-between flex items-center rounded-sm">Delete Server <FontAwesomeIcon icon={faArrowRightFromBracket} /></li>
+                {access.manageServer || access.manageChannels || selectedServer.owner === user.email ? 
+                  <li className='border-b-2 border-[#2e2f31] my-1'></li>:null}
+                {access.manageServer || selectedServer.owner === user.email ? 
+                  <li onClick={()=> setPopup({...popup, serverSettings:true, serverInfo:false, showPopup: true})} className="hover:bg-blue cursor-pointer text-gray-100 hover:text-white hover:bg-blue-50 p-1 px-2 text-sm justify-between flex items-center rounded-sm">Server Settings <FontAwesomeIcon icon={faGear} /></li>:null}
+                {access.manageChannels || selectedServer.owner === user.email ? 
+                  <li onClick={()=> setPopup({...popup, createChannel:true, serverInfo:false, showPopup: true})} className="hover:bg-blue cursor-pointer text-gray-100 hover:text-white hover:bg-blue-50 p-1 px-2 text-sm justify-between flex items-center rounded-sm">Create Channel <FontAwesomeIcon icon={faPlus} /></li>:null}
+                {access.manageServer || access.manageChannels || selectedServer.owner === user.email ? 
+                  <li className='border-b-2 border-[#2e2f31] my-1'></li>:null}
+                {selectedServer.owner === user.email ? <li onClick={()=> deleteServer()} className="hover:bg-red-500 cursor-pointer text-red-500 hover:text-white p-1 px-2 text-sm justify-between flex items-center rounded-sm">Delete Server <FontAwesomeIcon icon={faArrowRightFromBracket} /></li>
                 : <li onClick={()=> leaveServer()} className="hover:bg-red-500 cursor-pointer text-red-500 hover:text-white p-1 px-2 text-sm justify-between flex items-center rounded-sm">Leave Server <FontAwesomeIcon icon={faArrowRightFromBracket} /></li>
                 }
               </ul>

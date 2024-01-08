@@ -2,9 +2,10 @@ import React, { useState, useEffect} from 'react'
 import {io} from 'socket.io-client'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircle, faSquare, faSquareCheck } from '@fortawesome/free-solid-svg-icons';
+import { faCircle } from '@fortawesome/free-solid-svg-icons';
+import { faSquare, faSquareCheck } from '@fortawesome/free-regular-svg-icons';
 
-const AddMembers = ({selectedServer, input, setInput, popup, setPopup, access}) => {
+const AddMembers = ({selectedServer, input, setInput, popup, setPopup}) => {
 const [socket, setSocket] = useState(null);
 useEffect(() => {
   const socket = io(process.env.REACT_APP_SERVER);
@@ -40,7 +41,7 @@ function AddMember(){
                         : setInput({ ...input, addRole: [...(input.addRole || []), user.email] })
                     }
                   >
-                    <FontAwesomeIcon icon={input.addRole?.includes(user.email) ? faSquareCheck : faSquare}/> <img src={user.imageUrl} alt="user" className='rounded-full w-8'/>{user.name}
+                    <FontAwesomeIcon icon={input.addRole?.includes(user.email) ? faSquareCheck : faSquare} className={input.addRole?.includes(user.email) ? 'text-blue-50' : 'text-gray-100'}/> <img src={user.imageUrl} alt="user" className='rounded-full w-8'/>{user.name}
                   </div>
                 ) : null)}
               </div>

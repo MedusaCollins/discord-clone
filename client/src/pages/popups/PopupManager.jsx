@@ -22,7 +22,7 @@ const PopupManager = ({input, setInput, selected, selectedServer, popup, setPopu
           {/* ServerSettings menüsüne gerekli params değerlerini taşımamız gerekli */}
           {selectedServer.channels !== undefined && selectedServer.channels !== null ?(
             <>
-              {popup.serverSettings && (<ServerSettings selected={selected} input={input} setInput={setInput} selectedServer={selectedServer} setPopup={setPopup} popup={popup} filterMenu={filterMenu} setFilterMenu={setFilterMenu}/>)}
+              {popup.serverSettings && (<ServerSettings selected={selected} input={input} setInput={setInput} selectedServer={selectedServer} setPopup={setPopup} popup={popup} filterMenu={filterMenu} setFilterMenu={setFilterMenu} access={access} user={user}/>)}
               {popup.addMembers && (<AddMembers selected={selected} input={input} setInput={setInput} selectedServer={selectedServer} setPopup={setPopup} popup={popup} access={access} user={user} data={data} setData={setData}/>)}
               {popup.serverInvite && (<ServerInvite selected={selected} input={input} setInput={setInput} selectedServer={selectedServer} setPopup={setPopup} popup={popup} access={access}/>)}
               {filterMenu.banPopup && (<UserBan selected={selected} input={input} setInput={setInput} selectedServer={selectedServer} setPopup={setPopup} popup={popup} filterMenu={filterMenu} setFilterMenu={setFilterMenu}/>)}

@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { io } from 'socket.io-client'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faChevronDown, faUserGroup, faMagnifyingGlass, faCircleCheck, faGavel, faCircle, faXmark, faCheck, faXmarkCircle } from '@fortawesome/free-solid-svg-icons'
+import { faChevronDown, faUserGroup, faMagnifyingGlass, faCircleCheck, faGavel, faCircle, faXmark, faCheck, faXmarkCircle, faCommentSlash, faScroll } from '@fortawesome/free-solid-svg-icons'
 import { faCircleXmark } from '@fortawesome/free-regular-svg-icons'
 
 const ServerSettings = (
-    {selectedServer, setPopup, popup, input, setInput, selected, filterMenu, setFilterMenu }
+    {selectedServer, setPopup, popup, input, setInput, selected, filterMenu, setFilterMenu, access, user }
 ) => {
   const [socket, setSocket] = useState(null);
   useEffect(() => {
@@ -20,6 +20,10 @@ const ServerSettings = (
   const [selectedRole, setSelectedRole] = useState(null);
   const [selectedPage, setSelectedPage] = useState(0);
   const [unsavedChanges, setUnsavedChanges] = useState(false)
+  const [filterLog, setFilterLog] = useState({
+    user: "All",
+    search: "",
+  })
   const serverSettings = [
     "Overview",
     "Roles",
@@ -73,6 +77,37 @@ const ServerSettings = (
       e.preventDefault();
       setInput({...input, serverName: selectedServer.name, roleName: selectedRole.name, roleColor: selectedRole.color, roleAccess: selectedRole.access})
     }
+
+    const filterUsers = () => {
+      const searchTerm = (input.searchMembers || '').toLowerCase(); // Set default value to empty string if undefined
+    
+      // Tüm kullanıcıları filtrele
+      const filteredUsers = selectedServer.serverUsers.filter(user => {
+        const userNameLowerCase = user.name.toLowerCase();
+        return userNameLowerCase.includes(searchTerm);
+      });
+    
+      // Filtrelenmiş kullanıcıları göster
+      return filteredUsers.map((user, index) => (
+        <button
+          key={index}
+          className={`flex justify-between items-center w-full px-2 py-3 ${
+            filterLog.user === user.name ? 'bg-blue-50 text-white' : 'hover:bg-black-50 text-gray-100'
+          } rounded-md`}
+          onClick={() => {
+            setFilterLog({ ...filterLog, user: user.name });
+            setFilterMenu({ ...filterMenu, userPopup: false });
+          }}
+        >
+          <span className='flex items-center text-sm gap-2'>
+            <img src={user.imageUrl} alt="user" className='w-6 rounded-full' />
+            {user.name}
+          </span>
+          {filterLog.user === user.name && <FontAwesomeIcon icon={faCircleCheck} className='text-sm' />}
+        </button>
+      ));
+    };
+    
   const showSettingsMenu = () => {
     switch (serverSettings[currentStep]) {
       case "Overview":
@@ -256,32 +291,73 @@ const ServerSettings = (
               <p className='font-bold'>Audit Log</p>
               <div className='flex flex-col'>
                 <div className='flex  gap-3 text-gray-200 text-ssm'>
-                <p>Filter by User<button onClick={() => setFilterMenu({...filterMenu, userPopup: !filterMenu.userPopup})}  className='ml-3'>All <FontAwesomeIcon icon={faChevronDown}  className='text-white mx-0.5 text-[8px]'/></button></p>
+                <p>Filter by User<button onClick={() => setFilterMenu({...filterMenu, userPopup: !filterMenu.userPopup})}  className='ml-3'>{filterLog.user} <FontAwesomeIcon icon={faChevronDown}  className='text-white mx-0.5 text-[8px]'/></button></p>
                 </div>
               {filterMenu.userPopup && (
-              <div className='bg-black-100 border border-black-50 absolute mt-7 shadow-inner p-2'>
+              <div className='bg-black-100 border border-black-50 absolute mt-7 shadow-2xl p-2 h-[210px]'>
                 <div className='flex'>
-                <input value={input.searchMembers} type="text" onChange={(e) => setInput({...input, searchMembers:e.target.value})} placeholder='Search Members'
+                <input value={input.searchMembers || ""} type="text" onChange={(e) => setInput({...input, searchMembers:e.target.value})} placeholder='Search Members'
                   className=" px-2 py-2 mb-2 text-sm rounded-l-sm bg-[#1E1F22] text-gray-300 border-0 ring-0 outline-none resize-none"/>
                 <FontAwesomeIcon icon={faMagnifyingGlass} className='text-gray-100 bg-[#1E1F22] py-2.5 px-2 rounded-r-sm'/>
                 </div>
                 <div className='space-y-1 max-h-[200px] shadow-3xl overflow-auto no-scrollbar'>
-                <button className='flex justify-between items-center text-white w-full px-2 py-3 bg-blue-50 rounded-md'><span className='flex items-center text-sm gap-2'><FontAwesomeIcon icon={faUserGroup} alt="All user" className='w-6'/>All Users</span> <FontAwesomeIcon icon={faCircleCheck} className='text-sm'/></button>
-                {selectedServer.serverUsers.map((user, index) => (
-                  <button key={index} className='flex justify-between items-center text-gray-100 w-full px-2 py-3 hover:bg-black-50 rounded-md'><span className='flex items-center text-ssm gap-2'><img src={user.imageUrl} alt="user" className='w-6 rounded-full'/> {user.name}</span></button>
-                  ))}
-                </div>
+                <button className={`flex justify-between items-center w-full px-2 py-3 ${filterLog.user === "All" ? 'bg-blue-50 text-white' : 'hover:bg-black-50 text-gray-100'} rounded-md`} onClick={()=> {setFilterLog({...filterLog, user: "All"}); setFilterMenu({...filterMenu, userPopup: false})}}><span className='flex items-center text-sm gap-2'><FontAwesomeIcon icon={faUserGroup} alt="All user" className='w-6'/>All Users</span> {filterLog.user === "All" && <FontAwesomeIcon icon={faCircleCheck} className='text-sm'/>}</button>
+                {input.searchMembers === "" ? (
+                  // Eğer input boşsa, tüm kullanıcıları göster
+                  selectedServer.serverUsers.map((user, index) => (
+                    <button
+                      key={index}
+                      className={`flex justify-between items-center w-full px-2 py-3 ${
+                        filterLog.user === user.name ? 'bg-blue-50 text-white' : 'hover:bg-black-50 text-gray-100'
+                      } rounded-md`}
+                      onClick={() => {
+                        setFilterLog({ ...filterLog, user: user.name });
+                        setFilterMenu({ ...filterMenu, userPopup: false });
+                      }}
+                    >
+                      <span className='flex items-center text-sm gap-2'>
+                        <img src={user.imageUrl} alt="user" className='w-6 rounded-full' />
+                        {user.name}
+                      </span>
+                      {filterLog.user === user.name && <FontAwesomeIcon icon={faCircleCheck} className='text-sm' />}
+                    </button>
+                  ))
+                ) : (
+                  // Eğer input doluysa, filtrelenmiş kullanıcıları göster
+                  <>{filterUsers()}</>
+                )}
+              </div>
               </div>)}
               </div>
             </div>
             
             
             <div className='space-y-2'>
-              <div className='w-full flex items-center text-sm py-1 px-2 rounded-md bg-black-200 border border-black-400'>
-                    <FontAwesomeIcon icon={faMagnifyingGlass} className='text-gray-100'/>
-                    <img src={process.env.REACT_APP_IMG} alt="user" className='w-10 rounded-full'/>
-                    <p className='text-gray-100'>username do blabllalbal.</p>
-              </div>
+              {selectedServer.logs.length !== 0 ?(
+
+                selectedServer.logs.reverse().map((log, index) => (
+                  filterLog.user === "All" || log.byWhom.name === filterLog.user ? (
+                  
+                  <div className='w-full flex items-center text-sm py-1 px-2 gap-2 rounded-md bg-black-200 border border-black-400' key={index}>
+                  <FontAwesomeIcon icon={log.type === "messageDelete" ? faCommentSlash : null} className='text-gray-100'/>
+                  <img src={log.byWhom.imageUrl} alt="byWhom" className='w-7 rounded-full'/>
+                  <p className='text-gray-100'>
+                  {log.type === "messageDelete" ? (
+                    <span>
+                        {`${log.byWhom.name} deleted `}
+                        <span className='text-white'>1 message</span>
+                        {` by ${log.toWho} in `}
+                        <span className='text-white'>{log.channel}</span>
+                      </span>
+                    ) : null}
+                  </p>
+                  </div>
+                  ):null))
+              ): <div className='flex flex-col items-center justify-center text-center h-[300px] text-gray-200'>
+                <FontAwesomeIcon icon={faScroll} className='text-6xl mb-5'/>
+                <p className='font-semibold'>NO LOGS YET</p>
+                <p className='w-80 leading-5 my-2'>Once moderators begin moderating, you can moderate the moderation here.</p>
+                </div>}
             </div>
           </div>)
       case "Bans":
@@ -320,22 +396,35 @@ const ServerSettings = (
   };
   return (
     <div className="fixed inset-0 z-50 flex text-white text-left bg-[#313338]">
-        <div className='bg-[#2B2D31] w-[38.4%] items-end px-2 text-left flex flex-col divide-y divide-[#46484b] space-y-3'>
-            <ul className='w-40 text-sm text-gray-100 pt-5'>
-              <p className='flex p-1 text-ssm font-bold'>{selectedServer.name}</p>
-              {serverSettings.map((step, index) => (
-                <div key={index}>
-                {index===3 && 
-                  <span>
-                    <div className='border-t border-[#46484b] my-2'></div>
-                    <p className='flex p-1 text-ssm font-bold'>MODERATION</p>
-                  </span>
-                }
-                <li key={index} onClick={()=> setCurrentStep(index)} className={`p-1 my-0.5 cursor-pointer rounded-md ${currentStep===index ? 'text-white bg-black-focus' :'hover:bg-black-hover'}`}>{step}</li>
-                </div>
-              ))}
-            </ul>
-        </div>        
+                <div className='bg-[#2B2D31] w-[38.4%] items-end px-2 text-left flex flex-col divide-y divide-[#46484b] space-y-3'>
+                    <ul className='w-40 text-sm text-gray-100 pt-5'>
+                      <p className='flex p-1 text-ssm font-bold'>{selectedServer.name}</p>
+                      {serverSettings.map((step, index) => (
+                        <div key={index}>
+                          {(index === 3 && access.manageServer) || (index === 3 && selectedServer.owner === user.email) ? (
+                            <span>
+                              <div className='border-t border-[#46484b] my-2'></div>
+                              <p className='flex p-1 text-ssm font-bold'>MODERATION</p>
+                            </span>
+                          ):null}
+                          {step === "Overview" && (
+                            <li key={index} onClick={() => setCurrentStep(index)} className={`p-1 my-0.5 cursor-pointer rounded-md ${currentStep === index ? 'text-white bg-black-focus' : 'hover:bg-black-hover'}`}>{step}</li>)}
+                          {step === "Roles" && (access.manageRoles || selectedServer.owner === user.email ? (
+                            <li key={index} onClick={() => setCurrentStep(index)} className={`p-1 my-0.5 cursor-pointer rounded-md ${currentStep === index ? 'text-white bg-black-focus' : 'hover:bg-black-hover'}`}>{step}</li>
+                          ) : null)}
+                          {step === "Emoji" && (access.manageEmojis || selectedServer.owner === user.email ? (
+                            <li key={index} onClick={() => setCurrentStep(index)} className={`p-1 my-0.5 cursor-pointer rounded-md ${currentStep === index ? 'text-white bg-black-focus' : 'hover:bg-black-hover'}`}>{step}</li>
+                          ) : null)}
+                          {step === "Audit Log" && (access.manageServer || selectedServer.owner === user.email ? (
+                            <li key={index} onClick={() => setCurrentStep(index)} className={`p-1 my-0.5 cursor-pointer rounded-md ${currentStep === index ? 'text-white bg-black-focus' : 'hover:bg-black-hover'}`}>{step}</li>
+                          ) : null)}
+                          {step === "Bans" && (access.manageUsers || selectedServer.owner === user.email ? (
+                            <li key={index} onClick={() => setCurrentStep(index)} className={`p-1 my-0.5 cursor-pointer rounded-md ${currentStep === index ? 'text-white bg-black-focus' : 'hover:bg-black-hover'}`}>{step}</li>
+                          ) : null)}
+                        </div>
+                      ))}
+                    </ul>
+                </div>        
         <div className='flex pt-5 ml-8 space-x-8'>
               {showSettingsMenu()}
             <button className="text-3xl text-gray-200 hover:text-gray-100 h-0" onClick={()=> setPopup({...popup, serverSettings: false, showPopup: false})}><FontAwesomeIcon icon={faCircleXmark} /></button>

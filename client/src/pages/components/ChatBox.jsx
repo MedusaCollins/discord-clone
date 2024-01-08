@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faArrowLeftLong, faArrowRightLong, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { faArrowLeftLong, faArrowRightLong, faPlus, faTrash, faCrown } from '@fortawesome/free-solid-svg-icons'
 import { io } from "socket.io-client";
 // fix that path later
 import img from './../../static/lost.svg';
@@ -56,7 +56,10 @@ const ChatBox = (params) => {
     }
   };
   const removeMessage = (msg) => {
-    socket.emit("removeMessage", { message: msg, channelID: selectedChannel._id, deletedBy: params.user });
+    socket.emit("removeMessage", { message: msg,  channelID: selectedChannel._id, deletedBy: params.user });
+    if(msg.user.email !== params.user.email){
+      socket.emit("addLog", { serverID: selected.serverID, channelName: `#${selectedChannel.name}`, messageOwner: msg.user.name, user: params.user, type: 'messageDelete' })
+    }
   }
 
   return (
@@ -70,7 +73,7 @@ const ChatBox = (params) => {
                   <>
                     <img src={msg.user.imageUrl} alt="" className='w-8 h-8 rounded-full absolute top-2.5' />
                     <div className='px-5'>
-                      <p style={{ color: `${selectedServer.serverRoles && selectedServer.serverRoles.find(role => role.name === msg.user.roles[0]).color}` }}>{msg.user.name}</p>
+                      <p style={{ color: `${selectedServer.serverRoles && selectedServer.serverRoles.find(role => role.name === msg.user.roles[0]).color}` }}>{msg.user.name} {selectedServer.owner === msg.user.email && <FontAwesomeIcon icon={faCrown} className='text-orange-400'/>}</p>
                       <p className='text-slate-100 text-xs text-wrap break-words max-w-[1350px]'>{msg.message}</p>
                     </div>
                   </>
