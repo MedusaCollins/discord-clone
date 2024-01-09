@@ -34,7 +34,8 @@ const CreateServer = ({input, setInput, popup, setPopup, data, setData, user, se
           }
           else{
             let serverUser = res.data.serverUsers.find(u => u.name === user.name)
-            socket.emit("sendMessage", { serverID: res.data._id, channelID: res.data.channels[0]._id, messageType: 'joinServer', message: 'just slid into the server.', user: serverUser });
+            let systemMessages = res.data.channels.filter(channel => channel.systemMessages === true)
+            socket.emit("sendMessage", { serverID: res.data._id, channelID: systemMessages[0]._id, messageType: 'joinServer', message: 'just slid into the server.', user: serverUser });
             socket.emit('joinServer', {serverID: input.joinServer, user: user})
             setData([...data, res.data]);
             setInput('');

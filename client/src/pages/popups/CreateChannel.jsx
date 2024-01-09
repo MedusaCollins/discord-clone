@@ -33,6 +33,7 @@ function createChannel(){
             "Member"
           ]
         },
+        systemMessages: false,
         messages: [],
       }
     }

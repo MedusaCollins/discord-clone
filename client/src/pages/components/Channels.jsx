@@ -5,7 +5,7 @@ import { io } from "socket.io-client";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faAngleDown, faHashtag, faVolumeHigh, faArrowRightFromBracket, faX, faGear, faUserPlus, faPlus } from '@fortawesome/free-solid-svg-icons'
 
-const Channels = ({selected, selectedServer, setLogin, setSelected, data,setData, user, popup, setPopup, access, setInput}) => {
+const Channels = ({selected, selectedServer, setLogin, setSelected, data, setData, user, popup, setPopup, access, input, setInput}) => {
   const [socket, setSocket] = useState(null);
   useEffect(() => {
     const socket = io(process.env.REACT_APP_SERVER);
@@ -13,13 +13,14 @@ const Channels = ({selected, selectedServer, setLogin, setSelected, data,setData
   }, []);
 
   useEffect(() => {
-    setInput({serverName: selectedServer.name, channelType: "Text"})
+    setInput({...input, serverName: selectedServer.name, channelType: "Text"})
   }, [selectedServer])
 
   async function leaveServer() {
     selectedServer.serverUsers.map((selectedUser) => {
       if (selectedUser.email === user.email) {
-        socket.emit("sendMessage", { serverID: selectedServer._id, channelID: selectedServer.channels[0]._id, messageType: 'leaveServer', message: 'just left the server.', user: selectedUser });
+        let systemMessages = selectedServer.channels.filter(channel => channel.systemMessages === true)
+        socket.emit("sendMessage", { serverID: selectedServer._id, channelID: systemMessages[0]._id, messageType: 'leaveServer', message: 'just left the server.', user: selectedUser });
         axios.post(`${process.env.REACT_APP_SERVER}/leaveServer`, { serverID: selectedServer._id, user: selectedUser }).then((res) => {
           setData(res.data);
           setSelected({ serverID: null, channelID: null });

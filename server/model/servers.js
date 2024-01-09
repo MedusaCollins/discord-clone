@@ -24,6 +24,7 @@ const ChannelSchema = new mongoose.Schema({
   name: String,
   type: String,
   access: AccessSchema,
+  systemMessages: Boolean,
   messages: [MessageSchema]
 });
 

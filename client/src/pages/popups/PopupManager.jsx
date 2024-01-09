@@ -14,7 +14,6 @@ const PopupManager = ({input, setInput, selected, selectedServer, popup, setPopu
     selectedUser: [],
     user: "",
   })
-
   return (
     <div className={`fixed inset-0 z-50 ${popup.showPopup ? 'flex' : 'hidden'} items-center justify-center bg-[#000000] bg-opacity-60`} onClick={() => setPopup({...popup, showPopup: false})}>
       <div className="relative bg-[#313338] rounded-md shadow-md mx-5" onClick={(e) => e.stopPropagation()}>

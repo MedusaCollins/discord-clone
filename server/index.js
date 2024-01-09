@@ -59,7 +59,6 @@ app.post("/joinServer", async (req, res) => {
         const isServer = await Serverdb.findById(req.body.serverID);
         if(isServer){
           const server = await Serverdb.findByIdAndUpdate(req.body.serverID, { $push: { serverUsers: user } }, { new: true });
-          console.log("test")
           res.send(server)
         }else{
           res.send({'Error': 'This server does not exist.'});
@@ -97,6 +96,7 @@ app.post("/createServer", async (req, res) => {
         name: 'General 1',
         type: 'Text',
         access: { read: ['Owner', 'Admin', 'Moderator', 'Member', 'Guest'], write: ['Owner', 'Admin', 'Moderator', 'Member'] },
+        systemMessages: true,
         messages: []
       }
     ],
@@ -279,6 +279,17 @@ io.on("connection", (socket) => {
     socket.on("updateServer", async (data) => {
       try {
         const server = await Serverdb.findByIdAndUpdate(data.serverID, { $set: {name: data.serverName} }, { new: true});
+        let systemMessages = server.channels.filter(channel => channel.systemMessages == true);
+        if(systemMessages[0].name !== data.systemMessages){
+          server.channels.map(channel => {
+            if(channel.systemMessages == true){
+              channel.systemMessages = false;
+            }
+            else if(channel.name == data.systemMessages){
+              channel.systemMessages = true;
+            }
+          })
+        }
         const updatedRoles = server.serverRoles.map(role => {
           if (role._id == data.roleID) {
             server.serverUsers.map(user => {

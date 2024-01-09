@@ -33,19 +33,20 @@ export default function Home(params) {
     const user= params.user;
 
     const [input, setInput] = useState({
-            serverName: server.name,
-            searchMembers: "",
-            searchUserId: "",
-            channelType: "",
-            channelName: "",
-            roleName: "",
-            roleColor: "",
-            roleAccess: "",
-            addRole: [], // Initialize addRole as an empty array
-            createServer: `${user.name}'s Server`,
-            joinServer: '',
-            errorHandler: ''
-        });
+        serverName: server.name,
+        searchMembers: "",
+        searchUserId: "",
+        channelType: "",
+        channelName: "",
+        roleName: "",
+        roleColor: "",
+        roleAccess: "",
+        addRole: [], // Initialize addRole as an empty array
+        createServer: `${user.name}'s Server`,
+        systemMessages: "",
+        joinServer: '',
+        errorHandler: ''
+    });
     const [data, setData] = useState([])
     const [socket, setSocket] = useState(null);
 
@@ -138,6 +139,7 @@ export default function Home(params) {
             setPopup({...popup, serverInfo:false});
             if (selected.serverID !== undefined && selected.serverID !== null){
                 setAccess(checkUserRole(res.data, user).access)
+                setInput({...input, systemMessages: res.data.channels.filter(channel => channel.systemMessages === true)[0].name})
             }else{
                 setAccess(null)
             }

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { io } from 'socket.io-client'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faChevronDown, faUserGroup, faMagnifyingGlass, faCircleCheck, faGavel, faCircle, faXmark, faCheck, faXmarkCircle, faCommentSlash, faScroll } from '@fortawesome/free-solid-svg-icons'
+import { faChevronDown, faUserGroup, faMagnifyingGlass, faCircleCheck, faGavel, faCircle, faXmark, faCheck, faXmarkCircle, faCommentSlash, faScroll, faAngleDown } from '@fortawesome/free-solid-svg-icons'
 import { faCircleXmark } from '@fortawesome/free-regular-svg-icons'
 
 const ServerSettings = (
@@ -47,8 +47,8 @@ const ServerSettings = (
     setSelectedRole(role)
     setInput({...input, roleName: role.name, roleColor: role.color, roleAccess: role.access})
   }
-
   useEffect(() => {
+    setInput({...input, systemMessages: selectedServer.channels.filter(channel => channel.systemMessages === true)[0]?.name})
     if(selectedPage !== 2){
       selectRole(selectedServer.serverRoles[0])
     }
@@ -56,7 +56,12 @@ const ServerSettings = (
   useEffect(()=> {
     if(selectedServer !== null && selectedServer !== undefined && selectedRole !== null && selectedRole !== undefined){
 
-      if(input.serverName !== selectedServer.name || input.roleName !== selectedRole.name || input.roleColor !== selectedRole.color || input.roleAccess !== selectedRole.access){
+      if(input.serverName !== selectedServer.name 
+        || input.roleName !== selectedRole.name 
+        || input.roleColor !== selectedRole.color 
+        || input.roleAccess !== selectedRole.access 
+        || selectedServer.channels.filter(channel => channel.systemMessages === true && channel.name)[0].name !== input.systemMessages
+      ){
         setUnsavedChanges(true)
       }else{
         setUnsavedChanges(false)
@@ -69,13 +74,13 @@ const ServerSettings = (
   }
   const saveChanges = (e) => {
     e.preventDefault();
-    socket.emit("updateServer", { serverID: selectedServer._id, serverName: input.serverName, roleID: selectedRole._id, roleName: input.roleName, roleColor: input.roleColor, roleAccess: input.roleAccess})
+    socket.emit("updateServer", { serverID: selectedServer._id, serverName: input.serverName, roleID: selectedRole._id, roleName: input.roleName, roleColor: input.roleColor, roleAccess: input.roleAccess, systemMessages: input.systemMessages})
     setPopup({...popup, showPopup:false})
     setSelectedPage(0)
     }
     const resetChanges = (e) => {
       e.preventDefault();
-      setInput({...input, serverName: selectedServer.name, roleName: selectedRole.name, roleColor: selectedRole.color, roleAccess: selectedRole.access})
+      setInput({...input, serverName: selectedServer.name, roleName: selectedRole.name, roleColor: selectedRole.color, roleAccess: selectedRole.access, systemMessages: selectedServer.channels.filter(channel => channel.systemMessages === true)[0]?.name})
     }
 
     const filterUsers = () => {
@@ -138,19 +143,19 @@ const ServerSettings = (
                 </label>
                 <div className="relative">
                   <select
-                    value={selectedChannel || ""}
-                    onChange={(e) => setSelectedChannel(e.target.value)}
+                    value={input.systemMessages}
+                    onChange={(e) => setInput({...input, systemMessages: e.target.value})}
                     className="w-full px-2 py-2 text-sm rounded-sm bg-[#1E1F22] text-gray-300 border-0 ring-0 outline-none"
                   >
                     {selectedServer.channels.map((channel, index) => (
-                      <option key={index} value={channel.id}>
+                      <option key={index} value={channel.id} onChange={()=> setInput({...input, systemMessages: channel.name})}>
                         {channel.name}
                       </option>
                     ))}
                   </select>
-                  {/* <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
                     <FontAwesomeIcon icon={faAngleDown} className="text-gray-400" />
-                  </div> */}
+                  </div>
                 </div>
               </div>
           </div>
