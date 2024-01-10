@@ -59,6 +59,11 @@ const ServerSchema = new mongoose.Schema({
   serverUsers: [UserSchema],
   serverRoles: [RoleSchema],
   channels: [ChannelSchema],
+  bans: [{
+    user: UserSchema,
+    reason: String,
+    byWhom: UserSchema
+  }]
 });
 
 const Serverdb = mongoose.model('Server', ServerSchema);

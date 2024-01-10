@@ -8,7 +8,7 @@ const ServerInvite = ({selectedServer, popup, setPopup}) => {
         setTimeout(() => setText('Copy'), 1000)
       }
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#000000] bg-opacity-60" onClick={() => setPopup({...popup, serverInvite: false, showPopup: false})}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center" onClick={() => setPopup({...popup, serverInvite: false, showPopup: false})}>
     <div className="relative bg-[#313338] rounded-xl shadow-md mx-5" onClick={(e) => e.stopPropagation()}>
       <div className="text-center sm:w-96">
           <div className='p-4'>

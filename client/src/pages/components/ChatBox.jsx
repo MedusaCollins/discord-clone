@@ -6,7 +6,7 @@ import { io } from "socket.io-client";
 import img from './../../static/lost.svg';
 
 const ChatBox = (params) => {
-  const { selected, selectedServer, setServer, access} = params
+  const { selected, selectedServer, setServer, access, popup, setPopup} = params
   const [selectedChannel, setSelectedChannel] = useState(null)
   useEffect(() => {
     if (selectedServer !== "" && selected.channelID !== null) {
@@ -50,9 +50,14 @@ const ChatBox = (params) => {
   const sendMessage = (event) => {
     event.preventDefault();
     let user = selectedServer.serverUsers.find(u => u.name === params.user.name)
-    if (message !== "" && socket) {
-      socket.emit("sendMessage", { serverID: selected.serverID, channelID: selected.channelID, messageType: 'Message', message: message, user: user });
+    if(message === "/ban" && access.manageUsers){
       setMessage("");
+      setPopup({...popup, showPopup: true, manageBan: true})
+    }else{
+      if (message !== "" && socket) {
+        socket.emit("sendMessage", { serverID: selected.serverID, channelID: selected.channelID, messageType: 'Message', message: message, user: user });
+        setMessage("");
+      }
     }
   };
   const removeMessage = (msg) => {
@@ -64,7 +69,7 @@ const ChatBox = (params) => {
 
   return (
     <div className={`${selected.serverID !== null && selectedServer !== "" ? 'w-[80%]':'w-[90%]'} h-screen text-sm flex bg-black-100`}>
-      {selectedChannel !== null && selectedChannel !== undefined && selectedServer !== undefined && selectedServer.channels != null? (
+      {selectedChannel !== null && selectedChannel !== undefined && selectedServer !== undefined && selectedServer.channels != null && selected.serverID != null? (
         <div className='flex flex-col justify-between relative w-full'>
           <ul ref={chatAreaRef} className='overflow-auto'>
             {selectedChannel.messages.map((msg, index) => (

@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { io } from 'socket.io-client'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faChevronDown, faUserGroup, faMagnifyingGlass, faCircleCheck, faGavel, faCircle, faXmark, faCheck, faXmarkCircle, faCommentSlash, faScroll, faAngleDown } from '@fortawesome/free-solid-svg-icons'
+import { faChevronDown, faUserGroup, faMagnifyingGlass, faCircleCheck, faGavel, faCircle, faXmark, faCheck, faXmarkCircle, faCommentSlash, faScroll, faAngleDown, faGears, faCommentDots, faUserPlus, faUserMinus } from '@fortawesome/free-solid-svg-icons'
 import { faCircleXmark } from '@fortawesome/free-regular-svg-icons'
 
 const ServerSettings = (
-    {selectedServer, setPopup, popup, input, setInput, selected, filterMenu, setFilterMenu, access, user }
+    {selectedServer, setPopup, popup, input, setInput, filterMenu, setFilterMenu, access, user }
 ) => {
   const [socket, setSocket] = useState(null);
   useEffect(() => {
@@ -31,7 +31,6 @@ const ServerSettings = (
     "Audit Log",
     "Bans"
   ];
-  const [selectedChannel, setSelectedChannel] = useState(selected.channelID)
   const permissions = [
     { name: "Manage Server", key: "manageServer", description: "Allows members to delete messages by other members." },
     { name: "Manage Channels", key: "manageChannels", description: "Allows members to create, edit or delete channels." },
@@ -75,6 +74,9 @@ const ServerSettings = (
   const saveChanges = (e) => {
     e.preventDefault();
     socket.emit("updateServer", { serverID: selectedServer._id, serverName: input.serverName, roleID: selectedRole._id, roleName: input.roleName, roleColor: input.roleColor, roleAccess: input.roleAccess, systemMessages: input.systemMessages})
+    if(selectedServer.channels.filter(channel => channel.systemMessages === true)[0]?.name !== input.systemMessages){
+      socket.emit("addLog", {serverID: selectedServer._id, type: "systemMessages", user: user, channelName: input.systemMessages})
+    }
     setPopup({...popup, showPopup:false})
     setSelectedPage(0)
     }
@@ -344,17 +346,51 @@ const ServerSettings = (
                   filterLog.user === "All" || log.byWhom.name === filterLog.user ? (
                   
                   <div className='w-full flex items-center text-sm py-1 px-2 gap-2 rounded-md bg-black-200 border border-black-400' key={index}>
-                  <FontAwesomeIcon icon={log.type === "messageDelete" ? faCommentSlash : null} className='text-gray-100'/>
+                  <FontAwesomeIcon icon={
+                    log.type === "messageDelete" ? faCommentSlash : 
+                    log.type === "systemMessages" ? faGears : 
+                    log.type === "createChannel" ? faCommentDots :
+                    log.type === "ban" ? faUserMinus :
+                    log.type === "banRevoke" ? faUserPlus : null} className='text-gray-100'/>
                   <img src={log.byWhom.imageUrl} alt="byWhom" className='w-7 rounded-full'/>
                   <p className='text-gray-100'>
-                  {log.type === "messageDelete" ? (
+                  {log.type === "messageDelete" && (
                     <span>
                         {`${log.byWhom.name} deleted `}
                         <span className='text-white'>1 message</span>
                         {` by ${log.toWho} in `}
                         <span className='text-white'>{log.channel}</span>
                       </span>
-                    ) : null}
+                    )}
+                  {log.type === "systemMessages" && (
+                    <span>
+                        <span className='text-white'>{log.byWhom.name} </span>
+                        {`set the system messages channel to `}
+                        <span className='text-white'>#{log.channel}</span>
+                      </span>
+                    )}
+                    {log.type === "createChannel" && (
+                      <span>
+                          <span className='text-white'>{log.byWhom.name} </span>
+                          {`created the `}
+                          <span className='text-white'>#{log.channel} </span>
+                          {`channel.`}
+                        </span>
+                      )}
+                    {log.type === "ban" && (
+                      <span>
+                          <span className='text-white'>{log.byWhom.name} </span>
+                          {`banned `}
+                          <span className='text-white'>{log.toWho}</span>
+                        </span>
+                      )}
+                    {log.type === "banRevoke" && (
+                      <span>
+                          <span className='text-white'>{log.byWhom.name} </span>
+                          {`revoke the ban of `}
+                          <span className='text-white'>{log.toWho}</span>
+                        </span>
+                      )}
                   </p>
                   </div>
                   ):null))
@@ -382,17 +418,19 @@ const ServerSettings = (
 
 
             {/* Buradaki kısımda databaseyi düzelttikten sonra banlanan birisi varsa alttaki şekilde gösterilecek */}
+            {selectedServer.bans.length === 0 ?
             <div className='flex flex-col items-center justify-center rounded-md text-sm text-gray-200 border border-black-300 border-b-2 shadow-3xl h-[500px] space-y-2'>
               <FontAwesomeIcon icon={faGavel} className='text-6xl mb-10'/>
               <p className='font-bold text-gray-100'>NO BANS</p>
               <p className='w-64'>You haven't banned anybody... but if and when you must, do not hesitate!</p>
             </div>
-
-            {/* <div className='flex flex-col items-center p-3 rounded-md text-sm text-gray-200 border border-black-300 border-b-2 shadow-3xl h-[500px] space-y-0.5'>
-            {selectedServer.serverUsers.map((user, index) => (
-                  <button onClick={()=> setFilterMenu({...filterMenu, banPopup: true, selectedUser: user})} key={index} className='flex justify-between items-center w-full px-2 py-3 text-gray-100 bg-[#3F4147] hover:bg-black-50 rounded-md'><span className='flex items-center text-ssm gap-2'><img src={user.imageUrl} alt="user" className='w-6 rounded-full'/> {user.name}</span></button>
-                ))}
-            </div> */}
+            :
+            <div className='flex flex-col items-center p-3 rounded-md text-sm text-gray-200 border border-black-300 border-b-2 shadow-3xl h-[500px] space-y-0.5'>
+            {selectedServer.bans.map((ban, index) => (
+              <button onClick={()=> setFilterMenu({...filterMenu, banPopup: true, selectedUser: ban.user, reason: ban.reason, banID: ban._id})} key={index} className='flex justify-between items-center w-full px-2 py-3 text-gray-100 bg-[#3F4147] hover:bg-black-50 rounded-md'><span className='flex items-center text-ssm gap-2'><img src={ban.user.imageUrl} alt="user" className='w-6 rounded-full'/> {ban.user.name}</span></button>
+              ))}
+            </div>
+            }
             
           </div>)
       default:

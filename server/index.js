@@ -55,11 +55,16 @@ app.post("/joinServer", async (req, res) => {
       const server = await Serverdb.findOne({ 'serverUsers.email': req.body.user.email, '_id': new mongoose.Types.ObjectId(req.body.serverID) });
       if(server){
         res.send({'Error': 'You are already in this server.'});
-      }else{
+      }
+      else{
         const isServer = await Serverdb.findById(req.body.serverID);
         if(isServer){
-          const server = await Serverdb.findByIdAndUpdate(req.body.serverID, { $push: { serverUsers: user } }, { new: true });
-          res.send(server)
+          if(isServer.bans.find(ban => ban.user.email == req.body.user.email)){
+            res.send({'Error': 'You are banned from this server.'});
+          }else{
+            const server = await Serverdb.findByIdAndUpdate(req.body.serverID, { $push: { serverUsers: user } }, { new: true });
+            res.send(server)
+          }
         }else{
           res.send({'Error': 'This server does not exist.'});
         }
@@ -174,7 +179,8 @@ app.post("/createServer", async (req, res) => {
           manageVoice: false,
         }
       },
-    ]
+    ],
+    bans: [],
   };
 
   // Create a new Server document
@@ -211,6 +217,16 @@ app.post("/getServer", async (req, res) => {
     console.error("Login error:", error);
   }
 });
+
+app.post("/revokeBan", async (req, res) => {
+  console.log(req.body)
+  const server = await Serverdb.findById(req.body.serverID);
+  let selectedBan = server.bans.find(ban => ban._id == req.body.banID);
+  server.bans = server.bans.filter(ban => ban._id != req.body.banID);
+  await server.save();
+  io.emit("channelUpdate", {server: server});
+  res.send(selectedBan);
+})
 
 io.on("connection", (socket) => {
   try {  
@@ -329,11 +345,33 @@ io.on("connection", (socket) => {
         type: data.type,
         byWhom: data.user,
         toWho: data.messageOwner,
-        channel: data.channelName,
+      }
+      if (data.channelName) {
+        logMessage.channel = data.channelName;
       }
       server.logs.push(logMessage);
       await server.save();
       io.emit("updateServer", {server: server});
+    })
+    socket.on("addBan", async(data)=> {
+      const server = await Serverdb.findById(data.ban.serverID);
+      server.serverUsers = server.serverUsers.filter(user => user.email !== data.ban.toWho.email);
+      await server.save();
+      io.emit("getBanned", {server: server, toWho: data.ban.toWho});
+      if(data.ban.ban){
+        let ban ={
+          user: data.ban.toWho,
+          byWhom: data.ban.byWhom,
+          reason: data.ban.reason,
+        }
+        let logMessage = {
+          type: 'ban',
+          byWhom: data.log.user,
+          toWho: data.log.messageOwner,
+          reason: data.ban.reason,
+        }
+        const server = await Serverdb.findByIdAndUpdate(data.ban.serverID, { $push: { bans: ban, logs: logMessage } }, { new: true });
+      }
     })
   } catch (error) {
     console.error("Login error:", error);

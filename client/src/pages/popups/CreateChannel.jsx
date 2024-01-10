@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHashtag, faVolumeHigh } from '@fortawesome/free-solid-svg-icons';
 import { faCircle, faCircleDot } from '@fortawesome/free-regular-svg-icons';
 
-const CreateChannel = ({selectedServer, input, setInput, popup, setPopup, access}) => {
+const CreateChannel = ({selectedServer, input, setInput, popup, user, setPopup, access}) => {
 const [socket, setSocket] = useState(null);
 useEffect(() => {
   const socket = io(process.env.REACT_APP_SERVER);
@@ -40,6 +40,7 @@ function createChannel(){
     if(access.manageChannels){
       setPopup({...popup, createChannel: false, showPopup: false})
       socket.emit('createChannel', request);
+      socket.emit("addLog", {serverID: selectedServer._id, type: "createChannel", user: user, channelName: input.channelName})
     }
   }
 

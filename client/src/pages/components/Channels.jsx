@@ -13,7 +13,7 @@ const Channels = ({selected, selectedServer, setLogin, setSelected, data, setDat
   }, []);
 
   useEffect(() => {
-    setInput({...input, serverName: selectedServer.name, channelType: "Text"})
+    setInput({...input, serverName: selectedServer.name, channelType: "Text"}) // eslint-disable-next-line 
   }, [selectedServer])
 
   async function leaveServer() {
@@ -35,7 +35,7 @@ const Channels = ({selected, selectedServer, setLogin, setSelected, data, setDat
   }
   return (
     <div className="w-[10%] h-screen bg-black-200 text-white flex flex-col relative justify-between">
-      {selectedServer.channels != null ?
+      {selectedServer.channels != null && selected.serverID != null && selectedServer.serverUsers.find(selectedUser => selectedUser.email === user.email) ?
         <div>
           <button onClick={() => popup.serverInfo ? setPopup({...popup, serverInfo:false}): setPopup({...popup, serverInfo:true})} className='justify-between items-center flex px-5 py-2 w-full hover:bg-black-hover cursor-pointer transition-all'>{selectedServer.name} 
             <span className='text-sm text-gray-100'><FontAwesomeIcon icon={popup.serverInfo ? faX : faAngleDown} /></span>
@@ -69,7 +69,7 @@ const Channels = ({selected, selectedServer, setLogin, setSelected, data, setDat
                  <FontAwesomeIcon icon={faVolumeHigh} />} <span className={`${selected.channelID===channel._id ? 'text-white' :''}`} >{channel.name}</span>
               </span>
               {access.manageChannels &&
-              <FontAwesomeIcon icon={faGear} className='right-5 absolute hidden group-hover:block text-sm text-gray-100 hover:text-gray-50 col-span-1' onClick={() => setPopup({channelSettings: true, showPopup: true, channelInfo: channel})}/>}
+              <FontAwesomeIcon icon={faGear} className='right-5 absolute hidden group-hover:block text-sm text-gray-100 hover:text-gray-50 col-span-1' onClick={() => setPopup({...popup, channelSettings: true, showPopup: true, channelInfo: channel})}/>}
             </div>
           ))}
         </div>:

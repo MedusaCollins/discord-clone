@@ -26,6 +26,7 @@ export default function Home(params) {
         createServer: false,
         joinServer: false,
         addMembers: false,
+        manageBan: false,
         section: 1
       })
 
@@ -64,7 +65,7 @@ export default function Home(params) {
     }
     const [access, setAccess] = useState(null)
 
-    function serverUpdate(){
+    function serverUpdate(params){
         axios.post(`${process.env.REACT_APP_SERVER}/getServer`, { serverID: selected.serverID}).then(res => {
             setServer(res.data);
             if (selected.serverID !== undefined && selected.serverID !== null){
@@ -76,7 +77,7 @@ export default function Home(params) {
     }
     function serversUpdate(){
         setSelected({serverID: null, channelID: null})
-        axios.post(`${process.env.REACT_APP_SERVER}/listServers`, { user: params.user })
+        axios.post(`${process.env.REACT_APP_SERVER}/listServers`, { user: user })
           .then(res => {
             setData(res.data);
           }).catch(err => {
@@ -108,6 +109,14 @@ export default function Home(params) {
             }else{
                 serverUpdate()
             }
+        })
+        socket.on("getBanned", (data) => {
+            if(data.toWho.email === user.email){
+                serversUpdate()
+            }else if(data.server._id === selected.serverID && data.toWho.email !== user.email){
+                serverUpdate()
+            }
+            
         })
         socket.on("roleUpdate", (data) => {
             if(data.server._id === selected.serverID){
@@ -152,7 +161,7 @@ export default function Home(params) {
             <PopupManager input={input} setInput={setInput} selected={selected} selectedServer={server} popup={popup} setPopup={setPopup} access={access} user={user} data={data} setData={setData}/>
             <ServerSelect selected={selected} setSelected={setSelected} user={user} data={data} setData={setData} popup={popup} setPopup={setPopup}/>
             <Channels input={input} setInput={setInput} selected={selected} setSelected={setSelected} data={data} setData={setData} selectedServer={server} user={user} setLogin={params.setLogin} popup={popup} setPopup={setPopup} access={access}/>
-            <ChatBox selected={selected} selectedServer={server} setServer={setServer} user={user} access={access}/>
+            <ChatBox selected={selected} selectedServer={server} setServer={setServer} user={user} access={access} popup={popup} setPopup={setPopup}/>
             <Users selected={selected} selectedServer={server}/>
         </div>
     )
