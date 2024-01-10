@@ -232,7 +232,6 @@ io.on("connection", (socket) => {
   try {  
     socket.on("sendMessage", async (msg) => {
       try {
-        console.log(msg)
         const server = await Serverdb.findOne({ "channels._id": msg.channelID });
         const channel = server.channels.find(channel => channel._id == msg.channelID);
         const message={
@@ -367,9 +366,10 @@ io.on("connection", (socket) => {
         let logMessage = {
           type: 'ban',
           byWhom: data.log.user,
-          toWho: data.log.messageOwner,
+          toWho: data.log.messageOwner.name,
           reason: data.ban.reason,
         }
+        console.log(data)
         const server = await Serverdb.findByIdAndUpdate(data.ban.serverID, { $push: { bans: ban, logs: logMessage } }, { new: true });
       }
     })

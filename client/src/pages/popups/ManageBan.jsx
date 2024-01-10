@@ -49,8 +49,9 @@ const ManageBan = ({popup, setPopup, selectedServer, user, input, setInput }) =>
       };
 
     function addBan(params){
-        // socket.emit("addLog", { serverID: selectedServer._id, messageOwner: params.toWho.name, user: params.byWhom, type: 'ban' })
-        socket.emit("addBan", {ban: params, log: { serverID: selectedServer._id, messageOwner: params.toWho.name, user: params.byWhom, type: 'ban' }})
+        let systemMessages = selectedServer.channels.filter(channel => channel.systemMessages === true)
+        socket.emit("sendMessage", { serverID: selectedServer._id, channelID: systemMessages[0]._id, messageType: 'leaveServer', message: `${params.ban ? 'banned':'kicked'} by ${params.byWhom.name}.`, user: params.toWho });
+        socket.emit("addBan", {ban: params, log: { serverID: selectedServer._id, messageOwner: params.toWho, user: params.byWhom, type: 'ban' }})
         if(popup.manageBan || popup.showPopup){
             setPopup({...popup, manageBan: false, showPopup: false})
         }
