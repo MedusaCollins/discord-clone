@@ -39,6 +39,7 @@ export default function Home(params) {
         searchUserId: "",
         channelType: "",
         channelName: "",
+        selectedChannel: [],
         roleName: "",
         roleColor: "",
         roleAccess: "",
@@ -102,10 +103,9 @@ export default function Home(params) {
             serversUpdate()
         })
         socket.on("updateServer", (data)=> {
-            if(popup.serverSettings){
+            if(popup.serverSettings || popup.channelSettings){
                 serverUpdate()
-                setPopup({...popup, showPopup:false})
-                
+                setPopup({...popup, showPopup:false, serverSettings: false, channelSettings: false})
             }else{
                 serverUpdate()
             }

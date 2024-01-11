@@ -33,6 +33,10 @@ const Channels = ({selected, selectedServer, setLogin, setSelected, data, setDat
   async function deleteServer(){
     socket.emit('deleteServer', { serverID: selectedServer._id });
   }
+  function openServerSettings(params){
+    setPopup({...popup, channelSettings: true, showPopup: true, channelInfo: params})
+    setInput({...input, selectedChannel: selectedServer.channels.filter(channel => channel._id === params._id)[0]})
+  }
   return (
     <div className="w-[10%] h-screen bg-black-200 text-white flex flex-col relative justify-between">
       {selectedServer.channels != null && selected.serverID != null && selectedServer.serverUsers.find(selectedUser => selectedUser.email === user.email) ?
@@ -69,7 +73,7 @@ const Channels = ({selected, selectedServer, setLogin, setSelected, data, setDat
                  <FontAwesomeIcon icon={faVolumeHigh} />} <span className={`${selected.channelID===channel._id ? 'text-white' :''}`} >{channel.name}</span>
               </span>
               {access.manageChannels &&
-              <FontAwesomeIcon icon={faGear} className='right-5 absolute hidden group-hover:block text-sm text-gray-100 hover:text-gray-50 col-span-1' onClick={() => setPopup({...popup, channelSettings: true, showPopup: true, channelInfo: channel})}/>}
+              <FontAwesomeIcon icon={faGear} className='right-5 absolute hidden group-hover:block text-sm text-gray-100 hover:text-gray-50 col-span-1' onClick={() => openServerSettings(channel)}/>}
             </div>
           ))}
         </div>:

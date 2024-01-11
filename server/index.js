@@ -373,6 +373,24 @@ io.on("connection", (socket) => {
         const server = await Serverdb.findByIdAndUpdate(data.ban.serverID, { $push: { bans: ban, logs: logMessage } }, { new: true });
       }
     })
+    socket.on("updateChannel", async (data) => {
+      try {
+        const server = await Serverdb.findById(data.server._id)
+        const channelUpdate = server.channels.find(channel => channel._id == data.channel._id);
+        
+        if(channelUpdate){
+          channelUpdate.name = data.channel.name;
+          channelUpdate.type = data.channel.type;
+          channelUpdate.access = data.channel.access;
+          await server.save();
+          io.emit("updateServer", {server: server});
+        }else{
+          console.log('Channel not found')
+        }
+      } catch (error) {
+        console.error("Error updating channel:", error);
+      }
+    });
   } catch (error) {
     console.error("Login error:", error);
   }
