@@ -116,7 +116,6 @@ export default function Home(params) {
             }else if(data.server._id === selected.serverID && data.toWho.email !== user.email){
                 serverUpdate()
             }
-            
         })
         socket.on("roleUpdate", (data) => {
             if(data.server._id === selected.serverID){
@@ -132,7 +131,7 @@ export default function Home(params) {
         return () => {
             socket.disconnect();
         };
-    }, [selected]);
+    }, [selected.serverID]);
     useEffect(() => {
         axios.post(`${process.env.REACT_APP_SERVER}/listServers`, { user: params.user })
           .then(res => {
@@ -154,12 +153,12 @@ export default function Home(params) {
             }
         })
     }
-    , [selected]);
+    , [selected.serverID]);
 
     return(
         <div className="flex">
             <PopupManager input={input} setInput={setInput} selected={selected} selectedServer={server} popup={popup} setPopup={setPopup} access={access} user={user} data={data} setData={setData}/>
-            <ServerSelect selected={selected} setSelected={setSelected} user={user} data={data} setData={setData} popup={popup} setPopup={setPopup}/>
+            <ServerSelect selected={selected} setSelected={setSelected} selectedServer={server} user={user} data={data} setData={setData} popup={popup} setPopup={setPopup}/>
             <Channels input={input} setInput={setInput} selected={selected} setSelected={setSelected} data={data} setData={setData} selectedServer={server} user={user} setLogin={params.setLogin} popup={popup} setPopup={setPopup} access={access}/>
             <ChatBox selected={selected} selectedServer={server} setServer={setServer} user={user} access={access} popup={popup} setPopup={setPopup}/>
             <Users selected={selected} selectedServer={server}/>

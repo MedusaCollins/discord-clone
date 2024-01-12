@@ -381,7 +381,10 @@ io.on("connection", (socket) => {
         if(channelUpdate){
           channelUpdate.name = data.channel.name;
           channelUpdate.type = data.channel.type;
-          channelUpdate.access = data.channel.access;
+          data.access.read && !channelUpdate.access.read.includes(data.selectedRole) ? channelUpdate.access.read.push(data.selectedRole) : null;
+          data.access.write && !channelUpdate.access.write.includes(data.selectedRole) ? channelUpdate.access.write.push(data.selectedRole) : null;
+          !data.access.read && channelUpdate.access.read.includes(data.selectedRole) ? channelUpdate.access.read.pull(data.selectedRole) : null;
+          !data.access.write && channelUpdate.access.write.includes(data.selectedRole) ? channelUpdate.access.write.pull(data.selectedRole) : null;
           await server.save();
           io.emit("updateServer", {server: server});
         }else{
