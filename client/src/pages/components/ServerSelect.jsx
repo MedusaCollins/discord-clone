@@ -9,7 +9,7 @@ const ServerSelect = ({selected, setSelected, data, popup, setPopup, user}) => {
     const result = data.map(server => server._id===id && server.channels.map(channel => channel._id===selected.channelID))
     const hasTrue = result.flat().includes(true)
     if(!hasTrue){
-      data.map(server => server._id===id && setSelected({serverID:id, channelID:server.channels.find((channel) =>(channel.access.read).includes(server.serverUsers.find(u => u.email === user.email).roles[0]))._id}))
+      data.map(server => server._id===id && setSelected({serverID:id, channelID:server.owner === user.email ? server.channels[0]._id : server.channels.find((channel) =>(channel.access.read).includes(server.serverUsers.find(u => u.email === user.email).roles[0]))._id}))
       if(id === null){
         setSelected({...selected, serverID:id})
       }

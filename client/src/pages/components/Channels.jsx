@@ -64,7 +64,7 @@ const Channels = ({selected, selectedServer, setLogin, setSelected, setData, use
           )}
 
           {selectedServer.channels.map((channel,index) => {
-            if((channel.access.read).includes(selectedServer.serverUsers.find(u => u.email === user.email).roles[0])){
+            if(selectedServer.owner === user.email || access.manageChannels || (channel.access.read).includes(selectedServer.serverUsers.find(u => u.email === user.email).roles[0])){
             return(
               <div key={index} onClick={() => (selected.channelID!==channel._id ? setSelected({...selected, channelID:channel._id}) : null)} 
               className={`flex items-center group h-7 mx-2 my-1 px-2 cursor-pointer rounded-md transition-all
@@ -73,8 +73,8 @@ const Channels = ({selected, selectedServer, setLogin, setSelected, setData, use
                   {channel.type==='Text' ? <FontAwesomeIcon icon={faHashtag} className='mx-0.5'/> :
                   <FontAwesomeIcon icon={faVolumeHigh} />} <span className={`${selected.channelID===channel._id ? 'text-white' :''}`} >{channel.name}</span>
                 </span>
-                {access.manageChannels &&
-                  <FontAwesomeIcon icon={faGear} className='right-5 absolute hidden group-hover:block text-sm text-gray-100 hover:text-gray-50 col-span-1' onClick={() => openServerSettings(channel)}/>}
+                { selectedServer.owner === user.email || access.manageChannels ?
+                  <FontAwesomeIcon icon={faGear} className='right-5 absolute hidden group-hover:block text-sm text-gray-100 hover:text-gray-50 col-span-1' onClick={() => openServerSettings(channel)}/>:null}
               </div>
             )}
           })}

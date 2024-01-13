@@ -6,7 +6,7 @@ import { io } from "socket.io-client";
 import img from './../../static/lost.svg';
 
 const ChatBox = (params) => {
-  const { selected, selectedServer, setServer, access, popup, setPopup} = params
+  const { selected, selectedServer, setServer, access, popup, setPopup, user} = params
   const [selectedChannel, setSelectedChannel] = useState(null)
   useEffect(() => {
     if (selectedServer !== "" && selected.channelID !== null) {
@@ -99,9 +99,9 @@ const ChatBox = (params) => {
               </div>
             ))}
           </ul>
-            <form onSubmit={sendMessage} className={`p-1 mb-4 mx-3 flex items-center justify-center rounded-lg ${selectedChannel.access.write.includes(selectedServer.serverUsers.find(u => u.email === params.user.email).roles[0]) ? 'bg-black-50' : 'bg-black-200 cursor-not-allowed'}`}>
-              <button className={`w-4 h-4 text-sm p-1 mx-2 flex items-center justify-center rounded-full ${selectedChannel.access.write.includes(selectedServer.serverUsers.find(u => u.email === params.user.email).roles[0]) ? 'text-black-50 bg-gray-100' : 'text-black-100 bg-gray-200 cursor-not-allowed'}`}><FontAwesomeIcon icon={faPlus} /></button>
-              {selectedChannel.access.write.includes(selectedServer.serverUsers.find(u => u.email === params.user.email).roles[0]) ? (
+            <form onSubmit={sendMessage} className={`p-1 mb-4 mx-3 flex items-center justify-center rounded-lg ${selectedServer.owner === user.email || access.manageChannels || selectedChannel.access.write.includes(selectedServer.serverUsers.find(u => u.email === params.user.email).roles[0]) ? 'bg-black-50' : 'bg-black-200 cursor-not-allowed'}`}>
+              <button className={`w-4 h-4 text-sm p-1 mx-2 flex items-center justify-center rounded-full ${selectedServer.owner === user.email || access.manageChannels || selectedChannel.access.write.includes(selectedServer.serverUsers.find(u => u.email === params.user.email).roles[0]) ? 'text-black-50 bg-gray-100' : 'text-black-100 bg-gray-200 cursor-not-allowed'}`}><FontAwesomeIcon icon={faPlus} /></button>
+              { selectedServer.owner === user.email || access.manageChannels || selectedChannel.access.write.includes(selectedServer.serverUsers.find(u => u.email === params.user.email).roles[0]) ? (
                 <input type="text" value={message} onChange={(event) => setMessage(event.target.value)} className=' bg-black-50 border-0 text-sm focus:ring-0 p-1 focus:outline-none overflow-auto w-full text-white truncate' placeholder={`Message #${selectedChannel.name}`} />
                 ):(
                 <input type="text" value={message}  className=' bg-black-200 border-0 text-sm focus:ring-0 p-1 focus:outline-none overflow-auto w-full text-white truncate cursor-not-allowed' placeholder="You do not have permission to send messages in this channel." readOnly/>

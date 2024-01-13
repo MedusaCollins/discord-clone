@@ -123,6 +123,7 @@ const ChannelSettings = ({selectedServer, selected, input, setInput, popup, setP
       }
   const resetChanges = (e) => {
     setInput({...input, selectedChannel: selectedServer.channels.filter(channel => channel._id === selectedChannel._id)[0]})
+    setAccess({read: checkAccess('read'), write: checkAccess('write')})
   }
   const saveChanges = (e) => {
     socket.emit('updateChannel', { server: selectedServer, channel: input.selectedChannel, selectedRole: selectedRole.name, access: access})
