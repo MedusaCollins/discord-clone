@@ -99,9 +99,13 @@ const ChatBox = (params) => {
               </div>
             ))}
           </ul>
-            <form onSubmit={sendMessage} className='p-1 mb-4 mx-3 bg-black-50 flex items-center justify-center rounded-lg'>
-              <button className='bg-gray-100 text-black-50 w-4 h-4 text-sm p-1 mx-2 flex items-center justify-center rounded-full'><FontAwesomeIcon icon={faPlus} /></button>
-              <input type="text" value={message} onChange={(event) => setMessage(event.target.value)} className=' bg-black-50 border-0 text-sm focus:ring-0 p-1 focus:outline-none overflow-auto w-full text-white truncate' placeholder={`${selectedChannel.name} kanalına mesaj gönder`} />
+            <form onSubmit={sendMessage} className={`p-1 mb-4 mx-3 flex items-center justify-center rounded-lg ${selectedChannel.access.write.includes(selectedServer.serverUsers.find(u => u.email === params.user.email).roles[0]) ? 'bg-black-50' : 'bg-black-200 cursor-not-allowed'}`}>
+              <button className={`w-4 h-4 text-sm p-1 mx-2 flex items-center justify-center rounded-full ${selectedChannel.access.write.includes(selectedServer.serverUsers.find(u => u.email === params.user.email).roles[0]) ? 'text-black-50 bg-gray-100' : 'text-black-100 bg-gray-200 cursor-not-allowed'}`}><FontAwesomeIcon icon={faPlus} /></button>
+              {selectedChannel.access.write.includes(selectedServer.serverUsers.find(u => u.email === params.user.email).roles[0]) ? (
+                <input type="text" value={message} onChange={(event) => setMessage(event.target.value)} className=' bg-black-50 border-0 text-sm focus:ring-0 p-1 focus:outline-none overflow-auto w-full text-white truncate' placeholder={`Message #${selectedChannel.name}`} />
+                ):(
+                <input type="text" value={message}  className=' bg-black-200 border-0 text-sm focus:ring-0 p-1 focus:outline-none overflow-auto w-full text-white truncate cursor-not-allowed' placeholder="You do not have permission to send messages in this channel." readOnly/>
+              )}
             </form>
         </div>
       ) : 

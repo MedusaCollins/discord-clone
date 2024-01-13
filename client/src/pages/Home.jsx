@@ -69,6 +69,7 @@ export default function Home(params) {
     function serverUpdate(params){
         axios.post(`${process.env.REACT_APP_SERVER}/getServer`, { serverID: selected.serverID}).then(res => {
             setServer(res.data);
+            setData(data.map(server => server._id===res.data._id ? res.data : server));
             if (selected.serverID !== undefined && selected.serverID !== null){
                 setAccess(checkUserRole(res.data, user).access)
             }else{
