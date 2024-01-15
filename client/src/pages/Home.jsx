@@ -53,7 +53,10 @@ export default function Home(params) {
     const [socket, setSocket] = useState(null);
 
 
-
+    useEffect(() => {
+        console.log(data)
+      }, [data])
+      
     function checkUserRole(server, user){
         if (server.serverUsers !== undefined){
           var user = server.serverUsers.find(u => u.email === user.email)
@@ -78,7 +81,6 @@ export default function Home(params) {
         })
     }
     function serversUpdate(){
-        setSelected({serverID: null, channelID: null})
         axios.post(`${process.env.REACT_APP_SERVER}/listServers`, { user: user })
           .then(res => {
             setData(res.data);

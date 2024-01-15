@@ -155,7 +155,11 @@ const ChannelSettings = ({selectedServer, selected, input, setInput, popup, setP
                 ))}
                 <span>
                   <div className='border-t border-[#46484b] my-2'></div>
-                  <button className="p-1 my-0.5 cursor-pointer rounded-md hover:bg-black-hover w-full text-left flex justify-between items-center" onClick={() => deleteChannel(popup.channelInfo)}><p>Delete Channel</p><FontAwesomeIcon icon={faTrashCan} className='mx-0.5 text-ssm right-2 top-2'/></button>
+                  {!selectedChannel.systemMessages ? (
+                    <button className="p-1 my-0.5 cursor-pointer rounded-md hover:bg-black-hover w-full text-left flex justify-between items-center" onClick={() => deleteChannel(popup.channelInfo)}><p>Delete Channel</p><FontAwesomeIcon icon={faTrashCan} className='mx-0.5 text-ssm right-2 top-2'/></button>
+                  ): (
+                    <button className="p-1 my-0.5 rounded-md hover:bg-black-hover w-full text-left flex justify-between items-center cursor-not-allowed" ><p>Delete Channel</p><FontAwesomeIcon icon={faTrashCan} className='mx-0.5 text-ssm right-2 top-2'/></button>
+                  )}
                 </span>
               </ul>
           </div>        

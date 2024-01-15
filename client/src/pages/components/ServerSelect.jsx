@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus} from '@fortawesome/free-solid-svg-icons'
@@ -17,6 +17,7 @@ const ServerSelect = ({selected, setSelected, data, popup, setPopup, user}) => {
       setSelected({...selected, serverID:id})
     }
   }
+
   return (
     <div className="w-[3%] h-screen bg-black-400 py-5">
       <div className='space-y-2'>
@@ -31,7 +32,7 @@ const ServerSelect = ({selected, setSelected, data, popup, setPopup, user}) => {
           <div key={index} className='flex relative group cursor-pointer' onClick={() => (selected.serverID!==server._id && selectedUpdate(server._id))}>
             <div className={`w-[0.200rem] ${selected.serverID===server._id ? 'h-10 scale-100' :'h-5 my-2.5'} rounded-r-xl bg-white scale-0 group-hover:scale-100 absolute transition-all duration-300`}></div>
             <div className='flex mx-auto items-center justify-center'>
-              <img src={server.image} alt='server' className={`w-10 h-10 group-hover:rounded-xl ${selected.serverID===server._id ? 'rounded-xl': 'rounded-3xl'} transition-all duration-300`}/>
+              <img src={server.image} alt='server' className={`w-10 h-10 group-hover:rounded-xl ${selected.serverID===server._id ? 'rounded-xl': 'rounded-3xl'} transition-all duration-300`} key={server._id} />
             </div>
           </div>
         ))}

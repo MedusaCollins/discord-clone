@@ -11,7 +11,8 @@ const UserSchema = new mongoose.Schema({
 const MessageSchema = new mongoose.Schema({
   messageType: String,
   message: String,
-  user: UserSchema
+  user: UserSchema,
+  file: String
 });
 
 const AccessSchema = new mongoose.Schema({

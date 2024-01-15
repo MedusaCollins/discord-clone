@@ -19,6 +19,8 @@ const ServerSettings = (
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedRole, setSelectedRole] = useState(null);
   const [selectedPage, setSelectedPage] = useState(0);
+  const [prevImage, setPrevImage] = useState(selectedServer.image);
+  const [selectedFile, setSelectedFile] = useState(selectedServer.image);
   const [unsavedChanges, setUnsavedChanges] = useState(false)
   const [filterLog, setFilterLog] = useState({
     user: "All",
@@ -46,6 +48,8 @@ const ServerSettings = (
     setInput({...input, roleName: role.name, roleColor: role.color, roleAccess: role.access})
   }
   useEffect(() => {
+    setSelectedFile(selectedServer.image)
+    setPrevImage(selectedServer.image)
     setInput({...input, systemMessages: selectedServer.channels.filter(channel => channel.systemMessages === true)[0]?.name})
     if(selectedPage !== 2){
       selectRole(selectedServer.serverRoles[0])
@@ -56,7 +60,8 @@ const ServerSettings = (
       if(input.serverName !== selectedServer.name 
         || input.roleName !== selectedRole.name 
         || input.roleColor !== selectedRole.color 
-        || input.roleAccess !== selectedRole.access 
+        || input.roleAccess !== selectedRole.access
+        || selectedFile !== selectedServer.image
         || selectedServer.channels.filter(channel => channel.systemMessages === true && channel.name)[0].name !== input.systemMessages
       ){
         setUnsavedChanges(true)
@@ -64,14 +69,14 @@ const ServerSettings = (
         setUnsavedChanges(false)
       }
     }
-  },[input])
+  },[input, selectedFile])
 
   function removeRole(user){
     socket.emit("addRole", {serverID: selectedServer._id, role: selectedServer.serverRoles[selectedServer.serverRoles.length-1].name, users: [user.email]})
   }
   const saveChanges = (e) => {
     e.preventDefault();
-    socket.emit("updateServer", { serverID: selectedServer._id, serverName: input.serverName, roleID: selectedRole._id, roleName: input.roleName, roleColor: input.roleColor, roleAccess: input.roleAccess, systemMessages: input.systemMessages})
+    socket.emit("updateServer", { serverID: selectedServer._id, image: selectedFile, serverName: input.serverName, roleID: selectedRole._id, roleName: input.roleName, roleColor: input.roleColor, roleAccess: input.roleAccess, systemMessages: input.systemMessages})
     if(selectedServer.channels.filter(channel => channel.systemMessages === true)[0]?.name !== input.systemMessages){
       socket.emit("addLog", {serverID: selectedServer._id, type: "systemMessages", user: user, channelName: input.systemMessages})
     }
@@ -80,6 +85,8 @@ const ServerSettings = (
     }
     const resetChanges = (e) => {
       e.preventDefault();
+      setPrevImage(selectedServer.image)
+      setSelectedFile(selectedServer.image)
       setInput({...input, serverName: selectedServer.name, roleName: selectedRole.name, roleColor: selectedRole.color, roleAccess: selectedRole.access, systemMessages: selectedServer.channels.filter(channel => channel.systemMessages === true)[0]?.name})
     }
 
@@ -113,6 +120,27 @@ const ServerSettings = (
       ));
     };
     
+
+    
+    function convertToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const fileReader = new FileReader();
+        if (!file) {
+          console.log('please select an image');
+        } else {
+          fileReader.readAsDataURL(file);
+          fileReader.onload = () => resolve(fileReader.result);
+        }
+        fileReader.onerror = (error) => reject(error);
+      });
+    }
+
+    async function fileSelectHandler(e) {
+      const base64 = await convertToBase64(e.target.files[0]);
+      setSelectedFile(e.target.files[0]);
+      setPrevImage(base64);
+    }
+
   const showSettingsMenu = () => {
     switch (serverSettings[currentStep]) {
       case "Overview":
@@ -122,10 +150,18 @@ const ServerSettings = (
           <div className='divide-y divide-[#46484b] space-y-6'>
             <div className='grid grid-cols-2 space-x-3'>
               <div className='grid grid-cols-3 space-x-5'>
-                <img src={selectedServer.image} alt='server' className='rounded-full w-20'/>
+                <img src={prevImage} alt='server' className='rounded-full w-20 h-20'/>
                 <div className='col-span-2 space-y-3'>
                 <p className='text-ssm text-gray-100'>We recommend an image of at least 512x512 for the server.</p>
-                <button className='text-ssm border border-[#46484b] rounded-sm px-2 py-1.5'>Upload Image</button>
+                <div className='text-ssm border border-[#46484b] cursor-pointer rounded-sm'>
+                  <input type='file' onChange={fileSelectHandler} className='hidden'/>
+                  <p className='px-2 py-1.5' onClick={() =>{ 
+                    const fileInput = document.querySelector('input[type="file"]');
+                    if(fileInput){
+                      fileInput.click();
+                    }}}>Upload Image</p>
+
+                </div>
                 </div>
               </div>
 

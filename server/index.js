@@ -1,11 +1,12 @@
 import express from "express";
+import path from "path";
 import mongoose from "mongoose";
 import { Server } from "socket.io";
 import http from "http";
 import cors from "cors";
 import dotenv from "dotenv";
 import Serverdb from "./model/servers.js";
-
+import fs from "fs";
 
 dotenv.config();
 
@@ -16,6 +17,10 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json());
+
+const __filename = new URL(import.meta.url).pathname;
+const __dirname = path.dirname(__filename);
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -231,13 +236,29 @@ app.post("/revokeBan", async (req, res) => {
 io.on("connection", (socket) => {
   try {  
     socket.on("sendMessage", async (msg) => {
-      try {
+      try {        
         const server = await Serverdb.findOne({ "channels._id": msg.channelID });
         const channel = server.channels.find(channel => channel._id == msg.channelID);
         const message={
           messageType: msg.messageType,
           message: msg.message,
           user: msg.user,
+        }
+
+        if(msg.file){
+          const path = 'uploads';
+          const name = Math.floor(Math.random() * 100000) +'.jpg';
+  
+          fs.writeFile(`${path}/${name}`, msg.file, (err) => {
+              if (err) {
+                  console.error('Dosyayı kaydedemedi: ', err);
+              } else {
+                  console.log('Dosya başarıyla kaydedildi.');
+              }
+          });
+
+          
+          message.file = process.env.SERVER + '/' + path + '/' + name;
         }
 
         channel.messages.push(message);
@@ -294,6 +315,22 @@ io.on("connection", (socket) => {
     socket.on("updateServer", async (data) => {
       try {
         const server = await Serverdb.findByIdAndUpdate(data.serverID, { $set: {name: data.serverName} }, { new: true});
+        
+        if(data.image !== server.image){
+          const path = 'uploads';
+          const name = data.serverID + '_serverImage_'+ Math.floor(Math.random() * 100000) +'.jpg';
+          
+          fs.writeFile(`${path}/${name}`, data.image, (err) => {
+            if (err) {
+              console.error('Dosyayı kaydedemedi: ', err);
+            } else {
+              console.log('Dosya başarıyla kaydedildi.');
+            }
+          });
+          
+          server.image = process.env.SERVER + '/' + path + '/' + name;
+        }
+        
         let systemMessages = server.channels.filter(channel => channel.systemMessages == true);
         if(systemMessages[0].name !== data.systemMessages){
           server.channels.map(channel => {
