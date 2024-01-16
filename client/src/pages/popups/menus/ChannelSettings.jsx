@@ -5,7 +5,7 @@ import { faCircleXmark } from '@fortawesome/free-regular-svg-icons'
 
 import { io } from "socket.io-client";
 
-const ChannelSettings = ({selectedServer, selected, input, setInput, popup, setPopup}) => {
+const ChannelSettings = ({selectedServer, selected, input, setInput, popup, user, setPopup}) => {
     const [currentStep, setCurrentStep] = useState(0);
     const [unsavedChanges, setUnsavedChanges] = useState(false)
     const channelSettings = [
@@ -60,6 +60,7 @@ const ChannelSettings = ({selectedServer, selected, input, setInput, popup, setP
 
     function deleteChannel(channel){
       socket.emit('deleteChannel', {server: selectedServer, channel: channel})
+      socket.emit('addLog', {serverID: selectedServer._id, type: "deleteChannel", user: user, channelName: channel.name})
       setPopup({...popup, channelSettings: false, showPopup: false})
     }
 
@@ -127,6 +128,7 @@ const ChannelSettings = ({selectedServer, selected, input, setInput, popup, setP
   }
   const saveChanges = (e) => {
     socket.emit('updateChannel', { server: selectedServer, channel: input.selectedChannel, selectedRole: selectedRole.name, access: access})
+    socket.emit('addLog', {serverID: selectedServer._id, type: "updateChannel", user: user, channelName: input.selectedChannel.name})
     setPopup({...popup, channelSettings: false, showPopup: false})
   }
   useEffect(()=> {

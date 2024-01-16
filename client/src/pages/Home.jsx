@@ -37,7 +37,7 @@ export default function Home(params) {
         serverName: server.name,
         searchMembers: "",
         searchUserId: "",
-        channelType: "",
+        channelType: "Text",
         channelName: "",
         selectedChannel: [],
         roleName: "",
@@ -83,6 +83,7 @@ export default function Home(params) {
     function serversUpdate(){
         axios.post(`${process.env.REACT_APP_SERVER}/listServers`, { user: user })
           .then(res => {
+            setSelected({serverID: null, channelID: null})
             setData(res.data);
           }).catch(err => {
             console.log(err);

@@ -53,7 +53,7 @@ const ChatBox = (params) => {
   const sendMessage = (event) => {
     event.preventDefault();
     let user = selectedServer.serverUsers.find(u => u.name === params.user.name)
-    if(message === "/ban" && access.manageUsers){
+    if(message === "/ban" && (access.manageUsers || selectedServer.owner === user.email)){
       setMessage("");
       setPopup({...popup, showPopup: true, manageBan: true})
     }else{

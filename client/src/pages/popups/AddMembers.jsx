@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircle } from '@fortawesome/free-solid-svg-icons';
 import { faSquare, faSquareCheck } from '@fortawesome/free-regular-svg-icons';
 
-const AddMembers = ({selectedServer, input, setInput, popup, setPopup}) => {
+const AddMembers = ({selectedServer, input, setInput, popup, setPopup, user}) => {
 const [socket, setSocket] = useState(null);
 useEffect(() => {
   const socket = io(process.env.REACT_APP_SERVER);
@@ -13,6 +13,8 @@ useEffect(() => {
 }, []);
 function AddMember(){
     socket.emit("addRole", {serverID: selectedServer._id, role: input.roleName, users: input.addRole})
+    // console.log({serverID: selectedServer._id, type: "roleChanges", user: user, messageOwner: input.addRole[0], roleName: input.roleName})
+    socket.emit("addLog", {serverID: selectedServer._id, type: "roleChanges", user: user, messageOwner: input.addRole[0], roleName: input.roleName})
   }
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center text-white bg-[#000000] bg-opacity-60" onClick={() => (setPopup({...popup, addMembers: false}), setInput({...input, addRole: []}))}>

@@ -29,7 +29,7 @@ const PopupManager = ({input, setInput, selected, selectedServer, popup, setPopu
               {popup.serverInvite && (<ServerInvite selected={selected} input={input} setInput={setInput} selectedServer={selectedServer} setPopup={setPopup} popup={popup} access={access}/>)}
               {filterMenu.banPopup && (<UserBan selected={selected} input={input} setInput={setInput} selectedServer={selectedServer} setPopup={setPopup} popup={popup} filterMenu={filterMenu} setFilterMenu={setFilterMenu}/>)}
               {popup.createChannel && (<CreateChannel selected={selected} input={input} setInput={setInput} user={user} selectedServer={selectedServer} setPopup={setPopup} popup={popup} access={access}/>)}
-              {popup.channelSettings && (<ChannelSettings selected={selected} input={input} setInput={setInput} selectedServer={selectedServer} setPopup={setPopup} popup={popup}/>)}
+              {popup.channelSettings && (<ChannelSettings selected={selected} input={input} setInput={setInput} user={user} selectedServer={selectedServer} setPopup={setPopup} popup={popup}/>)}
               {popup.manageBan && (<ManageBan selected={selected} input={input} setInput={setInput} selectedServer={selectedServer} setPopup={setPopup} popup={popup} filterMenu={filterMenu} setFilterMenu={setFilterMenu} user={user}/>)}
             </>
           ):null}

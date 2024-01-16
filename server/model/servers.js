@@ -50,6 +50,7 @@ const logSchema = new mongoose.Schema({
   byWhom: UserSchema,
   toWho: String,
   channel: String,
+  role: String,
 });
 const ServerSchema = new mongoose.Schema({
   serverID: String,

@@ -314,12 +314,19 @@ io.on("connection", (socket) => {
     });
     socket.on("updateServer", async (data) => {
       try {
-        const server = await Serverdb.findByIdAndUpdate(data.serverID, { $set: {name: data.serverName} }, { new: true});
+        const server = await Serverdb.findById(data.serverID);
         
-        if(data.image !== server.image){
+        if (!server) {
+          console.error("Server not found");
+          return;
+        }
+
+        server.name = data.serverName;
+
+        if (data.image !== server.image) {
           const path = 'uploads';
-          const name = data.serverID + '_serverImage_'+ Math.floor(Math.random() * 100000) +'.jpg';
-          
+          const name = data.serverID + '_serverImage_' + Math.floor(Math.random() * 100000) + '.jpg';
+
           fs.writeFile(`${path}/${name}`, data.image, (err) => {
             if (err) {
               console.error('Dosyayı kaydedemedi: ', err);
@@ -327,46 +334,50 @@ io.on("connection", (socket) => {
               console.log('Dosya başarıyla kaydedildi.');
             }
           });
-          
+
           server.image = process.env.SERVER + '/' + path + '/' + name;
         }
-        
+
         let systemMessages = server.channels.filter(channel => channel.systemMessages == true);
-        if(systemMessages[0].name !== data.systemMessages){
-          server.channels.map(channel => {
-            if(channel.systemMessages == true){
+        if (systemMessages[0].name !== data.systemMessages) {
+          server.channels.forEach(channel => {
+            if (channel.systemMessages == true) {
               channel.systemMessages = false;
-            }
-            else if(channel.name == data.systemMessages){
+            } else if (channel.name == data.systemMessages) {
               channel.systemMessages = true;
             }
-          })
+          });
         }
+
         const updatedRoles = server.serverRoles.map(role => {
           if (role._id == data.roleID) {
-            server.serverUsers.map(user => {
+            server.serverUsers.forEach(user => {
               if (user.roles.includes(role.name)) {
                 user.roles = user.roles.filter(roleName => roleName != role.name);
                 user.roles.push(data.roleName);
               }
             });
-            server.channels.map(channel => {
+
+            server.channels.forEach(channel => {
               channel.access.read = channel.access.read.filter(roleName => roleName != role.name);
               channel.access.write = channel.access.write.filter(roleName => roleName != role.name);
               channel.access.read.push(data.roleName);
               channel.access.write.push(data.roleName);
-              channel.messages.map(message => {
+
+              channel.messages.forEach(message => {
                 if (message.user.roles.includes(role.name)) {
                   message.user.roles = message.user.roles.filter(roleName => roleName != role.name);
                   message.user.roles.push(data.roleName);
                 }
               });
             });
+
             return { ...role, name: data.roleName, access: data.roleAccess, color: data.roleColor };
           } else {
             return role;
           }
         });
+
         server.serverRoles = updatedRoles;
         await server.save();
         io.emit("updateServer", { server: server });
@@ -384,6 +395,9 @@ io.on("connection", (socket) => {
       }
       if (data.channelName) {
         logMessage.channel = data.channelName;
+      }
+      else if(data.roleName){
+        logMessage.role = data.roleName;
       }
       server.logs.push(logMessage);
       await server.save();
@@ -406,8 +420,15 @@ io.on("connection", (socket) => {
           toWho: data.log.messageOwner.name,
           reason: data.ban.reason,
         }
-        console.log(data)
         const server = await Serverdb.findByIdAndUpdate(data.ban.serverID, { $push: { bans: ban, logs: logMessage } }, { new: true });
+      }else{
+        let logMessage = {
+          type: 'kick',
+          byWhom: data.log.user,
+          toWho: data.log.messageOwner.name,
+          reason: data.ban.reason,
+        }
+        const server = await Serverdb.findByIdAndUpdate(data.ban.serverID, { $push: { logs: logMessage } }, { new: true });
       }
     })
     socket.on("updateChannel", async (data) => {

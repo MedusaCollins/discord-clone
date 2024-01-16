@@ -64,7 +64,7 @@ function createChannel(){
                     </div>
                     <FontAwesomeIcon icon={input.channelType === "Text" ? faCircleDot : faCircle} className="text-lg"/>
                   </button>
-                  <button onClick={() => setInput({...input, channelType: "Voice"})} className={`flex justify-between items-center ${input.channelType === "Voice" ? 'bg-black-focus':'bg-black-200 hover:bg-black-hover '} rounded-md p-2 pb-3`}>
+                  <div className={`flex justify-between items-center cursor-not-allowed ${input.channelType === "Voice" ? 'bg-black-focus':'bg-black-200 hover:bg-black-hover '} rounded-md p-2 pb-3`}>
                     <div className='flex text-left gap-2 justify-items items-center'>
                       <FontAwesomeIcon icon={faVolumeHigh} className='px-1 text-xl'/>
                       <div className='flex flex-col'>
@@ -73,7 +73,7 @@ function createChannel(){
                       </div>
                     </div>
                     <FontAwesomeIcon icon={input.channelType === "Voice" ? faCircleDot : faCircle} className="text-lg"/>
-                  </button>
+                  </div>
                 </div>
                 <div className='-mt-2'>
                 <label htmlFor="channel name" className="block text-ssm font-bold leading-6 text-gray-100">

@@ -71,14 +71,22 @@ const ServerSettings = (
     }
   },[input, selectedFile])
 
-  function removeRole(user){
-    socket.emit("addRole", {serverID: selectedServer._id, role: selectedServer.serverRoles[selectedServer.serverRoles.length-1].name, users: [user.email]})
+  function removeRole(selectedUser){
+    socket.emit("addRole", {serverID: selectedServer._id, role: selectedServer.serverRoles[selectedServer.serverRoles.length-1].name, users: [selectedUser.email]})
+    // console.log({serverID: selectedServer._id, role: selectedServer.serverRoles[selectedServer.serverRoles.length-1].name, users: [selectedUser.email]})
+    socket.emit("addLog", {serverID: selectedServer._id, type: "roleChanges", user: user, messageOwner: selectedUser.email, roleName: selectedServer.serverRoles[selectedServer.serverRoles.length-1].name})
   }
   const saveChanges = (e) => {
     e.preventDefault();
     socket.emit("updateServer", { serverID: selectedServer._id, image: selectedFile, serverName: input.serverName, roleID: selectedRole._id, roleName: input.roleName, roleColor: input.roleColor, roleAccess: input.roleAccess, systemMessages: input.systemMessages})
     if(selectedServer.channels.filter(channel => channel.systemMessages === true)[0]?.name !== input.systemMessages){
       socket.emit("addLog", {serverID: selectedServer._id, type: "systemMessages", user: user, channelName: input.systemMessages})
+    }else if(selectedServer.name !== input.serverName){
+      socket.emit("addLog", {serverID: selectedServer._id, type: "serverName", user: user, serverName: input.serverName})}
+    else if(selectedServer.image !== selectedFile){
+      socket.emit("addLog", {serverID: selectedServer._id, type: "serverImage", user: user, serverName: input.serverName})
+    }else if(selectedRole.name !== input.roleName || selectedRole.color !== input.roleColor || selectedRole.access !== input.roleAccess){
+      socket.emit("addLog", {serverID: selectedServer._id, type: "roleName", user: user, roleName: input.roleName})
     }
     setPopup({...popup, showPopup:false})
     setSelectedPage(0)
@@ -332,7 +340,7 @@ const ServerSettings = (
             </div>
             
             
-            <div className='space-y-2 h-screen overflow-auto'>
+            <div className='space-y-2 h-[800px] overflow-auto no-scrollbar'>
               {selectedServer.logs.length !== 0 ?(
                 selectedServer.logs.reverse().map((log, index) => (
                   filterLog.user === "All" || log.byWhom.name === filterLog.user ? (
@@ -340,10 +348,11 @@ const ServerSettings = (
                   <div className='w-full flex items-center text-sm py-1 px-2 gap-2 rounded-md bg-black-200 border border-black-400' key={index}>
                   <FontAwesomeIcon icon={
                     log.type === "messageDelete" ? faCommentSlash : 
-                    log.type === "systemMessages" ? faGears : 
+                    log.type === "systemMessages" || log.type === "serverName" || log.type === "serverImage" || log.type === "roleName" || log.type === "roleChanges" || log.type === "updateChannel" ? faGears: 
                     log.type === "createChannel" ? faCommentDots :
-                    log.type === "ban" ? faUserMinus :
-                    log.type === "banRevoke" ? faUserPlus : null} className='text-gray-100'/>
+                    log.type === "ban" || log.type === "kick" ? faUserMinus :
+                    log.type === "banRevoke" ? faUserPlus :
+                    log.type === "deleteChannel" ? faCommentSlash : null} className='text-gray-100'/>
                   <img src={log.byWhom.imageUrl} alt="byWhom" className='w-7 rounded-full'/>
                   <p className='text-gray-100'>
                   {log.type === "messageDelete" && (
@@ -354,6 +363,30 @@ const ServerSettings = (
                         <span className='text-white'>{log.channel}</span>
                       </span>
                     )}
+                  {(log.type === "serverName" || log.type === "serverImage") && (
+                    <span>
+                        <span className='text-white'>{log.byWhom.name} </span>
+                        {`changed the server `}
+                        {log.type === "serverName" ? `name.` : `image.`}
+                      </span>
+                    )}
+                  {log.type === "roleChanges" && (
+                    <span>
+                        <span className='text-white'>{log.byWhom.name} </span>
+                        {`has updated the role of the person with email `}
+                        <span className='text-white'>{log.toWho} </span>
+                        {`to `}
+                        <span className='text-white'>{log.role}.</span>
+                      </span>
+                    )}
+                  {log.type === "roleName" && (
+                    <span>
+                        <span className='text-white'>{log.byWhom.name} </span>
+                        {`updated the `}
+                        <span className='text-white'>{log.role} </span>
+                        {`role.`}
+                      </span>
+                    )}
                   {log.type === "systemMessages" && (
                     <span>
                         <span className='text-white'>{log.byWhom.name} </span>
@@ -361,25 +394,22 @@ const ServerSettings = (
                         <span className='text-white'>#{log.channel}</span>
                       </span>
                     )}
-                    {log.type === "createChannel" && (
+                    {(log.type === "createChannel" || log.type === "deleteChannel" || log.type === "updateChannel") && (
                       <span>
                           <span className='text-white'>{log.byWhom.name} </span>
-                          {`created the `}
+                          {log.type === "createChannel" && `created the `}
+                          {log.type === "deleteChannel" && `deleted the `}
+                          {log.type === "updateChannel" && `updated the `}
                           <span className='text-white'>#{log.channel} </span>
                           {`channel.`}
                         </span>
                       )}
-                    {log.type === "ban" && (
+                    {(log.type === "ban" || log.type === "kick" || log.type === "banRevoke") && (
                       <span>
                           <span className='text-white'>{log.byWhom.name} </span>
-                          {`banned `}
-                          <span className='text-white'>{log.toWho}</span>
-                        </span>
-                      )}
-                    {log.type === "banRevoke" && (
-                      <span>
-                          <span className='text-white'>{log.byWhom.name} </span>
-                          {`revoke the ban of `}
+                          {log.type==="ban" && `banned `}
+                          {log.type==="kick" && `kicked `}
+                          {log.type==="banRevoke" && `revoke the ban of `}
                           <span className='text-white'>{log.toWho}</span>
                         </span>
                       )}
