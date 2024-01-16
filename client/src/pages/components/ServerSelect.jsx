@@ -23,8 +23,8 @@ const ServerSelect = ({selected, setSelected, data, popup, setPopup, user}) => {
       <div className='space-y-2'>
         <div className='flex relative group cursor-pointer' onClick={() => (selected.serverID!==null && selectedUpdate(null))}>
             <div className={`w-[0.200rem] ${selected.serverID===null ? 'h-10 scale-100' :'h-5 my-2.5'} rounded-r-xl bg-white scale-0 group-hover:scale-100 absolute transition-all duration-300`}></div>
-            <div className='flex mx-auto items-center justify-center'>
-              <img src={process.env.REACT_APP_IMG} alt='server' className={`w-10 h-10 group-hover:rounded-xl ${selected._id===null ? 'rounded-xl': 'rounded-3xl'} bg-black-200 transition-all duration-300`}/>
+            <div className={`flex mx-auto items-center w-10 h-10 justify-center hover:rounded-xl hover:bg-blue-50 ${selected.serverID===null ? 'rounded-xl bg-blue-50': 'rounded-3xl bg-black-200'} transition-all duration-300`}>
+              <img src={process.env.REACT_APP_IMG} alt='server' className={`w-5 h-5`}/>
             </div>
         </div>
         <div className='border-t border-[#46484b] w-5 mx-auto'></div> 

@@ -11,7 +11,7 @@ function App() {
       {islogin ? (
         <Home user={user} setLogin={setLogin}/>
       ) : (
-        <div className="flex justify-center items-center h-screen">
+        <div className="flex justify-center items-center h-screen bg-black-400 bg-[url(https://wallpaperaccess.com/full/3053366.png)]">
           <Login setLogin={setLogin} setUser={setUser} />
         </div>
       )}
