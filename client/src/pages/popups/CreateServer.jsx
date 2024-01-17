@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react'
 import axios from 'axios'
 import { io } from 'socket.io-client'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faChevronRight} from '@fortawesome/free-solid-svg-icons'
+import { faChevronRight, faDoorOpen, faUnlockKeyhole} from '@fortawesome/free-solid-svg-icons'
 
 const CreateServer = ({input, setInput, popup, setPopup, data, setData, user, selectedServer}) => {
 
@@ -56,11 +56,11 @@ const CreateServer = ({input, setInput, popup, setPopup, data, setData, user, se
                     <p className='text-sm text-gray-200 mb-2'>Your server is where you and your friend hang out. Make yours and start talking.</p>
                     <div className='text-left space-y-2'>
                       <button onClick={()=> setPopup({...popup, section:3})} className="border rounded-md border-[#4E5058] hover:bg-[#3a3c41] p-2 pr-4 text-white flex items-center w-full">
-                        <img className="w-16 -ml-2" src={process.env.REACT_APP_IMG} alt="test" />Create My Own
+                        <FontAwesomeIcon icon={faUnlockKeyhole} className='text-xl mx-2'/> Create My Own
                         <FontAwesomeIcon icon={faChevronRight} className='ml-auto text-gray-200'/>
                       </button>
                       <button onClick={()=> setPopup({...popup, section:2})} className="border rounded-md border-[#4E5058] hover:bg-[#3a3c41] p-2 pr-4 text-white flex items-center w-full">
-                        <img className="w-16 -ml-2" src={process.env.REACT_APP_IMG} alt="test" />Join A Server
+                        <FontAwesomeIcon icon={faDoorOpen} className='text-xl mx-2'/> Join A Server
                         <FontAwesomeIcon icon={faChevronRight} className='ml-auto text-gray-200'/>
                       </button>
                     </div>
