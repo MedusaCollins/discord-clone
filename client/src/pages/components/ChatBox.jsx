@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faArrowLeftLong, faArrowRightLong, faPlus, faTrash, faCrown } from '@fortawesome/free-solid-svg-icons'
+import { faArrowLeftLong, faArrowRightLong, faPlus, faTrash, faCrown, faBars, faHashtag, faUsers } from '@fortawesome/free-solid-svg-icons'
 import { io } from "socket.io-client";
+import { MobileNavigation } from './MobileNavigation';
 // fix that path later
 import img from './../../static/lost.svg';
 
 const ChatBox = (params) => {
-  const { selected, selectedServer, setServer, access, popup, setPopup, user} = params
+  const { selected, setSelected, selectedServer, setServer, access, popup, setPopup, user} = params
   const [selectedChannel, setSelectedChannel] = useState(null)
   const [selectedFile, setSelectedFile] = useState(null)
   const [prevImage, setPrevImage] = useState(null)
@@ -92,10 +93,11 @@ const ChatBox = (params) => {
   }
 
   return (
-    <div className={`${selected.serverID !== null && selectedServer !== "" ? 'w-[80%]':'w-[90%]'} h-screen text-sm flex bg-black-100`}>
+    <div className={`${selected.serverID !== null && selectedServer !== "" ? 'w-[100%]':'w-[90%]'} ${selected.focus === "all" || selected.focus === "center"  ? 'flex': 'hidden'} h-screen text-sm bg-black-100`}>
       {selectedChannel !== null && selectedChannel !== undefined && selectedServer !== undefined && selectedServer.channels != null && selected.serverID != null? (
-        <div className='flex flex-col justify-between relative w-full'>
-          <ul ref={chatAreaRef} className='overflow-auto'>
+        <div className='flex-col flex justify-between relative w-full'>
+          <MobileNavigation selected={selected} setSelected={setSelected} selectedServer={selectedServer}/>
+          <ul ref={chatAreaRef} className={`overflow-auto ${window.innerWidth < 640 ? 'mt-14': null}`}>
             {selectedChannel.messages.map((msg, index) => (
               <div key={index} className='flex space-x-5 m-5 p-2 rounded-xl items-center break-words relative group hover:bg-black-200'>
                 {msg.messageType === 'Message' ? (

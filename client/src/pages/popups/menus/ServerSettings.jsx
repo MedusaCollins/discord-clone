@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { io } from 'socket.io-client'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faChevronDown, faUserGroup, faMagnifyingGlass, faCircleCheck, faGavel, faCircle, faXmark, faCheck, faXmarkCircle, faCommentSlash, faScroll, faAngleDown, faGears, faCommentDots, faUserPlus, faUserMinus } from '@fortawesome/free-solid-svg-icons'
+import { faChevronDown, faUserGroup, faMagnifyingGlass, faCircleCheck, faGavel, faCircle, faXmark, faCheck, faXmarkCircle, faCommentSlash, faScroll, faAngleDown, faGears, faCommentDots, faUserPlus, faUserMinus, faBars } from '@fortawesome/free-solid-svg-icons'
 import { faCircleXmark } from '@fortawesome/free-regular-svg-icons'
 
 const ServerSettings = (
-    {selectedServer, setPopup, popup, input, setInput, filterMenu, setFilterMenu, access, user }
+    {selectedServer, setPopup, popup, selected, setSelected, input, setInput, filterMenu, setFilterMenu, access, user }
 ) => {
   const [socket, setSocket] = useState(null);
   useEffect(() => {
@@ -26,6 +26,7 @@ const ServerSettings = (
     user: "All",
     search: "",
   })
+  const [focusRole, setFocusRole] = useState("left");
   const serverSettings = [
     "Overview",
     "Roles",
@@ -90,6 +91,7 @@ const ServerSettings = (
     }
     setPopup({...popup, showPopup:false})
     setSelectedPage(0)
+    window.innerWidth < 640 ? setSelected({...selected, focus: "left"}) : setSelected({...selected, focus: "all"})
     }
     const resetChanges = (e) => {
       e.preventDefault();
@@ -129,7 +131,13 @@ const ServerSettings = (
     };
     
 
-    
+    const truncateText = (text) => {
+      let limit = window.innerWidth < 470 ? 60 : window.innerWidth < 640 ? 90 : 28;
+      if (text.length > limit) {
+        return text.slice(0, limit) + '...';
+      }
+      return text;
+    };
     function convertToBase64(file) {
       return new Promise((resolve, reject) => {
         const fileReader = new FileReader();
@@ -153,10 +161,10 @@ const ServerSettings = (
     switch (serverSettings[currentStep]) {
       case "Overview":
         return (
-        <div className='w-[500px]'>
+        <div>
           <p className='mb-2 font-bold'>Server Overview</p>
           <div className='divide-y divide-[#46484b] space-y-6'>
-            <div className='grid grid-cols-2 space-x-3'>
+            <div className='grid grid-cols-1 sm:grid-cols-2 sm:space-x-3'>
               <div className='grid grid-cols-3 space-x-5'>
                 <img src={prevImage} alt='server' className='rounded-full w-20 h-20'/>
                 <div className='col-span-2 space-y-3'>
@@ -173,7 +181,7 @@ const ServerSettings = (
                 </div>
               </div>
 
-              <div className='-mt-2'>
+              <div className='mt-2 sm:-mt-2'>
                 <label htmlFor="invite link" className="block text-ssm font-bold leading-6 text-gray-100">
                   SERVER NAME
                 </label>
@@ -206,13 +214,13 @@ const ServerSettings = (
         </div>)
       case "Roles":
         return (
-          <div className='w-[500px] grid grid-cols-7'>
-            <div className='col-span-2 border-r border-[#46484b] px-1.5'>{selectedServer.serverRoles.map((role, index) => (
-              <button key={index} onClick={() => selectRole(role)} className={`${selectedRole !==null && selectedRole !==undefined && selectedRole.name === role.name ? 'bg-black-focus':'hover:bg-black-hover'} rounded-md px-2 py-1 my-0.5 text-sm gap-2 flex items-center w-full`}><FontAwesomeIcon icon={faCircle} className='w-3' style={{color: role.color}}/>{role.name}</button>
+          <div className={window.innerWidth < 640 ? 'w-full' : 'w-[500px] -mx-8 grid grid-cols-7'}>
+            <div className={`col-span-2 sm:border-r border-r-0 border-[#46484b] px-1.5 ${focusRole === "left" || selected.focus === "all" ? 'flex flex-col':'hidden'}`}>{selectedServer.serverRoles.map((role, index) => (
+              <button key={index} onClick={() => {selectRole(role); setFocusRole("center")}} className={`${selectedRole !==null && selectedRole !==undefined && selectedRole.name === role.name ? 'bg-black-focus':'hover:bg-black-hover'} rounded-md px-2 py-1 my-0.5 text-sm gap-2 flex items-center w-full`}><FontAwesomeIcon icon={faCircle} className='w-3' style={{color: role.color}}/>{role.name}</button>
             ))}
             </div>
-              <div className='col-span-5 pl-5'>
-              {selectedRole !== null && selectedRole !== undefined ? (
+              <div className={`col-span-5 ${(focusRole === "center" || selected.focus === "all") && 'pl-5'}`}>
+              {selectedRole !== null && selectedRole !== undefined && (focusRole === "center" || selected.focus === "all") ? (
                 <>
                 <h1>Edit Role - {selectedRole.name}</h1>
                 <div className='flex items-center gap-5 border-b my-5 border-[#46484b]'>
@@ -250,7 +258,7 @@ const ServerSettings = (
                 )}
                 {selectedPage === 1 && (
                   <div>
-                    <ul>
+                    <ul className="overflow-auto h-[500px] no-scrollbar">
                       {permissions.map((permission, index) => (
                         <li key={index} className='border-b border-[#46484b] pb-5 my-3'>
                           <div className='flex items-center justify-between my-2'>
@@ -271,7 +279,7 @@ const ServerSettings = (
                 {selectedPage === 2 && (
                   <div>
                     <button className='bg-blue-50 hover:bg-blue-200 px-3 py-2 mb-5 text-ssm rounded-sm w-full transition-all' onClick={() => setPopup({...popup, addMembers: true})}>Add Members</button>
-                    <div className='flex flex-col'>
+                    <div className='flex flex-col overflow-auto h-[500px]'>
                       {selectedServer.serverUsers.map((user, index) => {
                         if(user.roles[0] === selectedRole.name) {
                           return (
@@ -294,15 +302,15 @@ const ServerSettings = (
           </div>)
       case "Audit Log":
         return (
-          <div className='w-[500px] space-y-3'>
+          <div className='space-y-3'>
             <div className='flex justify-between border-b border-[#46484b] pb-4 mb-2'>
               <p className='font-bold'>Audit Log</p>
               <div className='flex flex-col'>
-                <div className='flex  gap-3 text-gray-200 text-ssm'>
+                <div className='flex gap-3 text-gray-200 text-ssm'>
                 <p>Filter by User<button onClick={() => setFilterMenu({...filterMenu, userPopup: !filterMenu.userPopup})}  className='ml-3'>{filterLog.user} <FontAwesomeIcon icon={faChevronDown}  className='text-white mx-0.5 text-[8px]'/></button></p>
                 </div>
               {filterMenu.userPopup && (
-              <div className='bg-black-100 border border-black-50 absolute mt-7 shadow-2xl p-2 h-[210px]'>
+              <div className={`bg-black-100 border border-black-50 absolute mt-7 ${window.innerWidth < 640 && 'right-5'} shadow-2xl p-2 h-[210px]`}>
                 <div className='flex'>
                 <input value={input.searchMembers || ""} type="text" onChange={(e) => setInput({...input, searchMembers:e.target.value})} placeholder='Search Members'
                   className=" px-2 py-2 mb-2 text-sm rounded-l-sm bg-[#1E1F22] text-gray-300 border-0 ring-0 outline-none resize-none"/>
@@ -340,7 +348,7 @@ const ServerSettings = (
             </div>
             
             
-            <div className='space-y-2 h-[800px] overflow-auto no-scrollbar'>
+            <div className='space-y-2 h-[500px] overflow-auto no-scrollbar'>
               {selectedServer.logs.length !== 0 ?(
                 selectedServer.logs.reverse().map((log, index) => (
                   filterLog.user === "All" || log.byWhom.name === filterLog.user ? (
@@ -360,7 +368,7 @@ const ServerSettings = (
                         {`${log.byWhom.name} deleted `}
                         <span className='text-white'>1 message</span>
                         {` by ${log.toWho} in `}
-                        <span className='text-white'>{log.channel}</span>
+                        <span className='text-white'>{truncateText(log.channel)}</span>
                       </span>
                     )}
                   {(log.type === "serverName" || log.type === "serverImage") && (
@@ -391,7 +399,7 @@ const ServerSettings = (
                     <span>
                         <span className='text-white'>{log.byWhom.name} </span>
                         {`set the system messages channel to `}
-                        <span className='text-white'>#{log.channel}</span>
+                        <span className='text-white'>#{truncateText(log.channel)}</span>
                       </span>
                     )}
                     {(log.type === "createChannel" || log.type === "deleteChannel" || log.type === "updateChannel") && (
@@ -400,7 +408,7 @@ const ServerSettings = (
                           {log.type === "createChannel" && `created the `}
                           {log.type === "deleteChannel" && `deleted the `}
                           {log.type === "updateChannel" && `updated the `}
-                          <span className='text-white'>#{log.channel} </span>
+                          <span className='text-white'>#{truncateText(log.channel)} </span>
                           {`channel.`}
                         </span>
                       )}
@@ -425,7 +433,7 @@ const ServerSettings = (
           </div>)
       case "Bans":
         return (
-          <div className='w-[500px] space-y-3'>
+          <div className='space-y-3'>
             <p className='font-semibold'>Server Ban List</p>
             <p className='text-ssm text-gray-100'>Bans by default are by account and IP. A user can circumvent an IP ban by using a proxy.</p>
 
@@ -441,13 +449,13 @@ const ServerSettings = (
 
             {/* Buradaki kısımda databaseyi düzelttikten sonra banlanan birisi varsa alttaki şekilde gösterilecek */}
             {selectedServer.bans.length === 0 ?
-            <div className='flex flex-col items-center justify-center rounded-md text-sm text-gray-200 border border-black-300 border-b-2 shadow-3xl h-[500px] space-y-2'>
+            <div className='flex flex-col items-center justify-center rounded-md text-sm text-gray-200 border border-black-300 border-b-2 shadow-3xl h-[400px] space-y-2'>
               <FontAwesomeIcon icon={faGavel} className='text-6xl mb-10'/>
               <p className='font-bold text-gray-100'>NO BANS</p>
               <p className='w-64'>You haven't banned anybody... but if and when you must, do not hesitate!</p>
             </div>
             :
-            <div className='flex flex-col items-center p-3 rounded-md text-sm text-gray-200 border border-black-300 border-b-2 shadow-3xl h-[500px] space-y-0.5'>
+            <div className='flex flex-col items-center p-3 rounded-md text-sm text-gray-200 border border-black-300 border-b-2 shadow-3xl h-[400px] overflow-auto no-scrollbar space-y-0.5'>
             {selectedServer.bans.map((ban, index) => (
               <button onClick={()=> setFilterMenu({...filterMenu, banPopup: true, selectedUser: ban.user, reason: ban.reason, banID: ban._id})} key={index} className='flex justify-between items-center w-full px-2 py-3 text-gray-100 bg-[#3F4147] hover:bg-black-50 rounded-md'><span className='flex items-center text-ssm gap-2'><img src={ban.user.imageUrl} alt="user" className='w-6 rounded-full'/> {ban.user.name}</span></button>
               ))}
@@ -461,9 +469,9 @@ const ServerSettings = (
   };
   return (
     <div className="fixed inset-0 z-50 flex text-white text-left bg-[#313338]">
-                <div className='bg-[#2B2D31] w-[38.4%] items-end px-2 text-left flex flex-col divide-y divide-[#46484b] space-y-3'>
-                    <ul className='w-40 text-sm text-gray-100 pt-5'>
-                      <p className='flex p-1 text-ssm font-bold'>{selectedServer.name}</p>
+                <div className={`bg-[#2B2D31] ${selected.focus === "left" || selected.focus === "all" ? 'flex flex-col': 'hidden'} ${window.innerWidth < 640 ? 'w-[100%] items-start': 'w-[50%] items-end'} text-left px-2 divide-y divide-[#46484b] space-y-3`}>
+                    <ul className={`${selected.focus === "left" || selected.focus ==="all" ? (window.innerWidth < 640 ? 'w-full' : 'w-40') : 'hidden'} text-sm text-gray-100 pt-5`}>
+                      <p className='flex p-1 text-ssm font-bold'>{truncateText(selectedServer.name)}</p>
                       {serverSettings.map((step, index) => (
                         <div key={index}>
                           {(index === 2 && access.manageServer) || (index === 2 && selectedServer.owner === user.email) ? (
@@ -473,33 +481,41 @@ const ServerSettings = (
                             </span>
                           ):null}
                           {step === "Overview" && (
-                            <li key={index} onClick={() => setCurrentStep(index)} className={`p-1 my-0.5 cursor-pointer rounded-md ${currentStep === index ? 'text-white bg-black-focus' : 'hover:bg-black-hover'}`}>{step}</li>)}
+                            <li key={index} onClick={() => {setCurrentStep(index); setSelected({...selected, focus: window.innerWidth < 640 ? "center" : "all"})}} className={`p-1 my-0.5 cursor-pointer rounded-md ${currentStep === index ? 'text-white bg-black-focus' : 'hover:bg-black-hover'}`}>{step}</li>
+                          )}
                           {step === "Roles" && (access.manageRoles || selectedServer.owner === user.email ? (
-                            <li key={index} onClick={() => setCurrentStep(index)} className={`p-1 my-0.5 cursor-pointer rounded-md ${currentStep === index ? 'text-white bg-black-focus' : 'hover:bg-black-hover'}`}>{step}</li>
+                            <li key={index} onClick={() => {setCurrentStep(index); setSelected({...selected, focus: window.innerWidth < 640 ? "center" : "all"})}} className={`p-1 my-0.5 cursor-pointer rounded-md ${currentStep === index ? 'text-white bg-black-focus' : 'hover:bg-black-hover'}`}>{step}</li>
                           ) : null)}
                           {step === "Audit Log" && (access.manageServer || selectedServer.owner === user.email ? (
-                            <li key={index} onClick={() => setCurrentStep(index)} className={`p-1 my-0.5 cursor-pointer rounded-md ${currentStep === index ? 'text-white bg-black-focus' : 'hover:bg-black-hover'}`}>{step}</li>
+                            <li key={index} onClick={() => {setCurrentStep(index); setSelected({...selected, focus: window.innerWidth < 640 ? "center" : "all"})}} className={`p-1 my-0.5 cursor-pointer rounded-md ${currentStep === index ? 'text-white bg-black-focus' : 'hover:bg-black-hover'}`}>{step}</li>
                           ) : null)}
                           {step === "Bans" && (access.manageUsers || selectedServer.owner === user.email ? (
-                            <li key={index} onClick={() => setCurrentStep(index)} className={`p-1 my-0.5 cursor-pointer rounded-md ${currentStep === index ? 'text-white bg-black-focus' : 'hover:bg-black-hover'}`}>{step}</li>
+                            <li key={index} onClick={() => {setCurrentStep(index); setSelected({...selected, focus: window.innerWidth < 640 ? "center" : "all"})}} className={`p-1 my-0.5 cursor-pointer rounded-md ${currentStep === index ? 'text-white bg-black-focus' : 'hover:bg-black-hover'}`}>{step}</li>
                           ) : null)}
                         </div>
                       ))}
                     </ul>
                 </div>        
-        <div className='flex pt-5 ml-8 space-x-8'>
-              {showSettingsMenu()}
-            <button className="text-3xl text-gray-200 hover:text-gray-100 h-0" onClick={()=> setPopup({...popup, serverSettings: false, showPopup: false})}><FontAwesomeIcon icon={faCircleXmark} /></button>
-            {unsavedChanges && (
-              <div className='justify-between items-center flex bg-black-400 px-2 py-2 w-[600px] rounded-md fixed bottom-5'> 
-              <p className='text-sm text-gray-50'>Careful - you have unsaved changes!</p>
-              <div className='flex gap-5'>
-                <button type='text' onClick={resetChanges} className='px-3 py-1 text-sm text-gray-50 hover:underline'>Reset</button>
-                <button type='submit' onClick={saveChanges} className='px-3 py-1 text-sm bg-green-700 hover:bg-green-900 transition-all rounded-sm'>Save Changes</button>
+
+          <div className={`${selected.focus === "center" || selected.focus === "all" ? 'flex': 'hidden'} ${window.innerWidth > 750 && 'pt-5 mx-8 space-x-8'} flex-col w-full relative`}>
+            <div className={`text-3xl text-gray-200 items-center ${window.innerWidth < 750 ? 'justify-between px-8 max-w-[750px]' : 'justify-end ml-12 max-w-[600px]'} flex my-5`}>
+              <button className={`hover:text-gray-100 cursor-pointer relative right-0 ${window.innerWidth > 750 && 'hidden'}`} onClick={()=> {setSelected({...selected, focus: 'left'}); setFocusRole("left")}}><FontAwesomeIcon icon={faBars} /></button>
+              <button className={`hover:text-gray-100 cursor-pointer relative right-0 `} onClick={()=> {setPopup({...popup, serverSettings: false, showPopup: false}); setSelected({...selected, focus: window.innerWidth < 640 ? 'left' : 'all'})}}><FontAwesomeIcon icon={faCircleXmark} /></button>
+             </div>
+              <div className="sm:w-[500px] px-8">
+                {showSettingsMenu()}
               </div>
-            </div>
-            )}
-        </div>        
+              {unsavedChanges && (
+                // flex items-center justify-center bg-black-400 px-2 py-2 rounded-md bottom-5 w-[500px] absolute
+                <div className={`flex items-center justify-center bg-black-400 px-2 py-2 mx-8 rounded-md bottom-5 max-w-[500px] absolute`}>
+                <p className='text-sm text-gray-50'>Careful - you have unsaved changes!</p>
+                <div className='flex gap-5'>
+                  <button type='text' onClick={resetChanges} className='px-3 py-1 text-sm text-gray-50 hover:underline'>Reset</button>
+                  <button type='submit' onClick={saveChanges} className='px-3 py-1 text-sm bg-green-700 hover:bg-green-900 transition-all rounded-sm'>Save Changes</button>
+                </div>
+              </div>
+              )}
+          </div>        
       </div> 
   )
 }

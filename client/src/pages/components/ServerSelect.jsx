@@ -9,9 +9,11 @@ const ServerSelect = ({selected, setSelected, data, popup, setPopup, user}) => {
     const result = data.map(server => server._id===id && server.channels.map(channel => channel._id===selected.channelID))
     const hasTrue = result.flat().includes(true)
     if(!hasTrue){
-      data.map(server => server._id===id && setSelected({serverID:id, channelID:server.owner === user.email ? server.channels[0]._id : server.channels.find((channel) =>(channel.access.read).includes(server.serverUsers.find(u => u.email === user.email).roles[0]))._id}))
+      data.map(server => server._id===id && 
+        ((window.innerWidth >= 640) ? setSelected({...selected, serverID:id, channelID:server.owner === user.email ? server.channels[0]._id : server.channels.find((channel) =>(channel.access.read).includes(server.serverUsers.find(u => u.email === user.email).roles[0]))._id})
+        : setSelected({ serverID: id, channelID: null, focus: "left"})))
       if(id === null){
-        setSelected({...selected, serverID:id})
+        (window.innerWidth >= 640) ? setSelected({...selected, serverID:id}) : setSelected({...selected, serverID:id, channelID:null})
       }
     }else{
       setSelected({...selected, serverID:id})
@@ -19,7 +21,7 @@ const ServerSelect = ({selected, setSelected, data, popup, setPopup, user}) => {
   }
 
   return (
-    <div className="w-[3%] h-screen bg-black-400 py-5">
+    <div className={`w-[3%] min-w-[50px] ${selected.focus === "all" || selected.focus === "left" ? 'flex flex-col':'hidden'} h-screen bg-black-400 py-5`}>
       <div className='space-y-2'>
         <div className='flex relative group cursor-pointer' onClick={() => (selected.serverID!==null && selectedUpdate(null))}>
             <div className={`w-[0.200rem] ${selected.serverID===null ? 'h-10 scale-100' :'h-5 my-2.5'} rounded-r-xl bg-white scale-0 group-hover:scale-100 absolute transition-all duration-300`}></div>

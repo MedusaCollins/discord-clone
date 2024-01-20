@@ -8,7 +8,7 @@ import CreateServer from './CreateServer'
 import AddMembers from './AddMembers'
 import ManageBan from './ManageBan'
 
-const PopupManager = ({input, setInput, selected, selectedServer, popup, setPopup, access, user, data, setData}) => {
+const PopupManager = ({input, setInput, selected, setSelected, selectedServer, popup, setPopup, access, user, data, setData}) => {
   const [filterMenu, setFilterMenu] = useState({
     userPopup: false,
     banPopup: false,
@@ -24,12 +24,12 @@ const PopupManager = ({input, setInput, selected, selectedServer, popup, setPopu
           {/* ServerSettings menüsüne gerekli params değerlerini taşımamız gerekli */}
           {selectedServer.channels !== undefined && selectedServer.channels !== null ?(
             <>
-              {popup.serverSettings && (<ServerSettings selected={selected} input={input} setInput={setInput} selectedServer={selectedServer} setPopup={setPopup} popup={popup} filterMenu={filterMenu} setFilterMenu={setFilterMenu} access={access} user={user}/>)}
+              {popup.serverSettings && (<ServerSettings selected={selected} setSelected={setSelected} input={input} setInput={setInput} selectedServer={selectedServer} setPopup={setPopup} popup={popup} filterMenu={filterMenu} setFilterMenu={setFilterMenu} access={access} user={user}/>)}
               {popup.addMembers && (<AddMembers selected={selected} input={input} setInput={setInput} selectedServer={selectedServer} setPopup={setPopup} popup={popup} access={access} user={user} data={data} setData={setData}/>)}
               {popup.serverInvite && (<ServerInvite selected={selected} input={input} setInput={setInput} selectedServer={selectedServer} setPopup={setPopup} popup={popup} access={access}/>)}
               {filterMenu.banPopup && (<UserBan selected={selected} input={input} setInput={setInput} selectedServer={selectedServer} setPopup={setPopup} popup={popup} filterMenu={filterMenu} setFilterMenu={setFilterMenu}/>)}
               {popup.createChannel && (<CreateChannel selected={selected} input={input} setInput={setInput} user={user} selectedServer={selectedServer} setPopup={setPopup} popup={popup} access={access}/>)}
-              {popup.channelSettings && (<ChannelSettings selected={selected} input={input} setInput={setInput} user={user} selectedServer={selectedServer} setPopup={setPopup} popup={popup}/>)}
+              {popup.channelSettings && (<ChannelSettings selected={selected} setSelected={setSelected} input={input} setInput={setInput} user={user} selectedServer={selectedServer} setPopup={setPopup} popup={popup}/>)}
               {popup.manageBan && (<ManageBan selected={selected} input={input} setInput={setInput} selectedServer={selectedServer} setPopup={setPopup} popup={popup} filterMenu={filterMenu} setFilterMenu={setFilterMenu} user={user}/>)}
             </>
           ):null}

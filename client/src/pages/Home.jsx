@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import ServerSelect from "./components/ServerSelect";
 import Channels from "./components/Channels";
@@ -6,14 +6,36 @@ import ChatBox from "./components/ChatBox";
 import Users from "./components/Users";
 
 import axios from "axios";
+import { debounce } from "lodash";
 import { io } from "socket.io-client";
 import PopupManager from "./popups/PopupManager";
 
 export default function Home(params) {
+    
     const [selected, setSelected] = useState({
         serverID: null,
         channelID: null,
     });    
+    let timer;
+    window.addEventListener("resize", (()=>{
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+            if(window.innerWidth >= 640){
+                setSelected({...selected, focus: "all"})
+            }else{
+                setSelected({...selected, focus: "left"})
+            }
+        }, 400);
+    }))
+
+    useEffect(()=>{
+        if(window.innerWidth >= 640){
+            setSelected({...selected, focus: "all"})
+        }else{
+            setSelected({...selected, focus: "left"})
+        }
+    }, [])
+
     const [popup, setPopup] = useState({
         showPopup: false,
         serverInfo: false,
@@ -161,11 +183,11 @@ export default function Home(params) {
 
     return(
         <div className="flex">
-            <PopupManager input={input} setInput={setInput} selected={selected} selectedServer={server} popup={popup} setPopup={setPopup} access={access} user={user} data={data} setData={setData}/>
+            <PopupManager input={input} setInput={setInput} selected={selected} setSelected={setSelected} selectedServer={server} popup={popup} setPopup={setPopup} access={access} user={user} data={data} setData={setData}/>
             <ServerSelect selected={selected} setSelected={setSelected} selectedServer={server} user={user} data={data} setData={setData} popup={popup} setPopup={setPopup}/>
             <Channels input={input} setInput={setInput} selected={selected} setSelected={setSelected} data={data} setData={setData} selectedServer={server} user={user} setLogin={params.setLogin} popup={popup} setPopup={setPopup} access={access}/>
-            <ChatBox selected={selected} selectedServer={server} setServer={setServer} user={user} access={access} popup={popup} setPopup={setPopup}/>
-            <Users selected={selected} selectedServer={server}/>
+            <ChatBox selected={selected} setSelected={setSelected} selectedServer={server} setServer={setServer} user={user} access={access} popup={popup} setPopup={setPopup}/>
+            <Users selected={selected} setSelected={setSelected} selectedServer={server}/>
         </div>
     )
 }
