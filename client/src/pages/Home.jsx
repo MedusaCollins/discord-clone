@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 
 import ServerSelect from "./components/ServerSelect";
 import Channels from "./components/Channels";
@@ -6,7 +6,6 @@ import ChatBox from "./components/ChatBox";
 import Users from "./components/Users";
 
 import axios from "axios";
-import { debounce } from "lodash";
 import { io } from "socket.io-client";
 import PopupManager from "./popups/PopupManager";
 
@@ -33,7 +32,7 @@ export default function Home(params) {
             setSelected({...selected, focus: "all"})
         }else{
             setSelected({...selected, focus: "left"})
-        }
+        } // eslint-disable-next-line
     }, [])
 
     const [popup, setPopup] = useState({
@@ -71,7 +70,7 @@ export default function Home(params) {
         joinServer: '',
         errorHandler: ''
     });
-    const [data, setData] = useState([])
+    const [data, setData] = useState([]) // eslint-disable-next-line
     const [socket, setSocket] = useState(null);
 
 
@@ -79,10 +78,10 @@ export default function Home(params) {
         console.log(data)
       }, [data])
       
-    function checkUserRole(server, user){
+    function checkUserRole(server, selectedUser){
         if (server.serverUsers !== undefined){
-          var user = server.serverUsers.find(u => u.email === user.email)
-          var role = server.serverRoles.find(role => role.name === user.roles[0])
+          var User = server.serverUsers.find(u => u.email === selectedUser.email)
+          var role = server.serverRoles.find(role => role.name === User.roles[0])
           return role
         }
         else{
@@ -156,7 +155,7 @@ export default function Home(params) {
         })
         return () => {
             socket.disconnect();
-        };
+        }; // eslint-disable-next-line
     }, [selected.serverID]);
     useEffect(() => {
         axios.post(`${process.env.REACT_APP_SERVER}/listServers`, { user: params.user })
@@ -164,7 +163,7 @@ export default function Home(params) {
             setData(res.data);
           }).catch(err => {
             console.log(err);
-          });
+          }); // eslint-disable-next-line
       }, []);
 
       useEffect(() => {
@@ -178,7 +177,7 @@ export default function Home(params) {
                 setAccess(null)
             }
         })
-    }
+    }// eslint-disable-next-line
     , [selected.serverID]);
 
     return(

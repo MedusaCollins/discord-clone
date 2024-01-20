@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faArrowLeftLong, faArrowRightLong, faPlus, faTrash, faCrown, faBars, faHashtag, faUsers } from '@fortawesome/free-solid-svg-icons'
+import { faArrowLeftLong, faArrowRightLong, faPlus, faTrash, faCrown  } from '@fortawesome/free-solid-svg-icons'
 import { io } from "socket.io-client";
 import { MobileNavigation } from './MobileNavigation';
 // fix that path later
@@ -36,7 +36,7 @@ const ChatBox = (params) => {
     })
     return () => {
       socket.disconnect();
-    };
+    };// eslint-disable-next-line
   }, [setServer, selectedServer]);
   useEffect(() => {
     if (chatAreaRef.current) {
@@ -47,7 +47,7 @@ const ChatBox = (params) => {
       if (!isScrolledToBottom) {
         chatArea.scrollTop = chatArea.scrollHeight - chatArea.clientHeight;
       }
-    }
+    }// eslint-disable-next-line
   }, [selectedChannel]);
 
 
@@ -133,15 +133,16 @@ const ChatBox = (params) => {
             <form onSubmit={sendMessage} className={`p-1 mb-4 mx-3 flex flex-col rounded-lg ${selectedServer.owner === user.email || access.manageChannels || selectedChannel.access.write.includes(selectedServer.serverUsers.find(u => u.email === params.user.email).roles[0]) ? 'bg-black-50' : 'bg-black-200 cursor-not-allowed'}`}>
             {prevImage && (
               <div className='flex items-start w-fit p-2'>
-                <img src={prevImage} alt='prev image' className='w-52 rounded-md p-2 pt-7 bg-black-200'/>
+                <img src={prevImage} alt='prev' className='w-52 rounded-md p-2 pt-7 bg-black-200'/>
                 <span type='text' onClick={()=> {setPrevImage(null); setSelectedFile(null)}} className='p-1 relative right-3 -top-2 bg-black-50 hover:bg-black-200 hover:cursor-pointer border border-black-200'><FontAwesomeIcon icon={faTrash} className='text-red-500 text-xs' /></span>
               </div>
               )}
 
             <div className='flex'>
               <div className='flex items-center justify-center m-2 px-4 py-2'>
-                  <input type='file' className='hidden' onChange={fileSelectHandler}/>
+                  <input type='file' className='hidden' onChange={fileSelectHandler}/> 
                   <FontAwesomeIcon icon={faPlus} 
+                  // eslint-disable-next-line
                   className={`w-3.5 h-3.5 fixed text-sm p-1 mx-2 flex items-center justify-center rounded-full ${(selectedServer.owner === user.email || access.manageChannels || selectedChannel.access.write.includes( selectedServer.serverUsers.find((u) => u.email === params.user.email)                 .roles[0]         )) ? 'text-black-50 bg-gray-100 cursor-pointer' : 'text-black-100 bg-gray-200 cursor-not-allowed' }`} 
                   onClick={() =>{ 
                     const fileInput = document.querySelector('input[type="file"]');

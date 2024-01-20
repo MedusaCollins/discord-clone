@@ -1,6 +1,6 @@
 import React, { useState, useEffect} from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrashCan, faCircle, faXmark, faCheck, faXmarkCircle, faBars } from '@fortawesome/free-solid-svg-icons';
+import { faTrashCan, faCircle, faXmark, faCheck, faBars } from '@fortawesome/free-solid-svg-icons';
 import { faCircleXmark } from '@fortawesome/free-regular-svg-icons'
 
 import { io } from "socket.io-client";
@@ -12,10 +12,10 @@ const ChannelSettings = ({selectedServer, selected, setSelected, input, setInput
         "Overview",
         "Permissions"
     ]
-    const [selectedChannel, setSelectedChannel] = useState(selectedServer.channels.filter(channel => channel._id === selected.channelID)[0])
+    const [selectedChannel] = useState(selectedServer.channels.filter(channel => channel._id === selected.channelID)[0])
     const [focusRole, setFocusRole] = useState("left");
     const [selectedRole, setSelectedRole] = useState(selectedServer.serverRoles[0]);
-    const [selectedPage, setSelectedPage] = useState(1);
+    const [selectedPage] = useState(1);
     const [access, setAccess] = useState({
       read: false,
       write: false,
@@ -29,7 +29,7 @@ const ChannelSettings = ({selectedServer, selected, setSelected, input, setInput
       
       if(selectedPage !== 2){
         selectRole(selectedServer.serverRoles[0])
-      }
+      }// eslint-disable-next-line
     },[selectedServer, popup])
 
     function checkAccess(params){
@@ -37,19 +37,8 @@ const ChannelSettings = ({selectedServer, selected, setSelected, input, setInput
     }
 
     useEffect(() => {
-    setAccess({read: checkAccess('read'), write: checkAccess('write')})
+    setAccess({read: checkAccess('read'), write: checkAccess('write')})// eslint-disable-next-line
     }, [selectedRole])
-    const permissions = [
-      { name: "Manage Server", key: "manageServer", description: "Allows members to delete messages by other members." },
-      { name: "Manage Channels", key: "manageChannels", description: "Allows members to create, edit or delete channels." },
-      { name: "Manage Roles", key: "manageRoles", description: "Allows members to create new roles and edit or delete roles lower than their highest role. Also allows members to change permissions of individual channels that they have access to." },
-      { name: "Manage Members", key: "manageUsers", description: "Allows members to remove other members from this server." },
-      { name: "Manage Messages", key: "manageMessages", description: "Allows members to delete messages by other members." },
-      { name: "Manage Voice", key: "manageVoice", description: "Allows members to mute/deafen/move/disconnect other members in voice channels." },
-      { name: "Create Expressions", key: "manageEmojis", description: "Allows members to add custom emoji in this server." },
-  
-    ];
-
 
     const [socket, setSocket] = useState(null);
     useEffect(() => {
@@ -142,7 +131,7 @@ const ChannelSettings = ({selectedServer, selected, setSelected, input, setInput
       }else{
         setUnsavedChanges(false)
       }
-    }
+    } //eslint-disable-next-line
   },[input, access])
 
   const truncateText = (text) => {

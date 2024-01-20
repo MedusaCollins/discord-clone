@@ -13,11 +13,10 @@ useEffect(() => {
 }, []);
 function AddMember(){
     socket.emit("addRole", {serverID: selectedServer._id, role: input.roleName, users: input.addRole})
-    // console.log({serverID: selectedServer._id, type: "roleChanges", user: user, messageOwner: input.addRole[0], roleName: input.roleName})
     socket.emit("addLog", {serverID: selectedServer._id, type: "roleChanges", user: user, messageOwner: input.addRole[0], roleName: input.roleName})
   }
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center text-white bg-[#000000] bg-opacity-60" onClick={() => (setPopup({...popup, addMembers: false}), setInput({...input, addRole: []}))}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center text-white bg-[#000000] bg-opacity-60" onClick={() => {setPopup({...popup, addMembers: false}); setInput({...input, addRole: []})}}>
         <div className="relative bg-[#313338] rounded-md shadow-md mx-5" onClick={(e) => e.stopPropagation()}>
           <div className="text-center sm:w-96">
               <div className='p-4 flex flex-col text-center'>
@@ -49,7 +48,7 @@ function AddMember(){
               </div>
               
               <div className='flex p-4 justify-end gap-5 rounded-b-xl bg-black-200'>
-                <button onClick={() => (setPopup({...popup, addMembers: false}), setInput({...input, addRole: []}))} className='hover:underline text-ssm'>Cancel</button>
+                <button onClick={() => {setPopup({...popup, addMembers: false}); setInput({...input, addRole: []})}} className='hover:underline text-ssm'>Cancel</button>
                 <button onClick={()=> AddMember()}  className='text-white text-ssm px-7 py-2 rounded-sm bg-blue-50 hover:bg-blue-200'>Add</button>
               </div>
           </div>

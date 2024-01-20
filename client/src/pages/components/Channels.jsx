@@ -71,7 +71,7 @@ const truncateText = (text) => {
               </ul>
             </div>
           )}
-
+          {/* eslint-disable-next-line */}
           {selectedServer.channels.map((channel,index) => {
             if(selectedServer.owner === user.email || access.manageChannels || (channel.access.read).includes(selectedServer.serverUsers.find(u => u.email === user.email).roles[0])){
             return(

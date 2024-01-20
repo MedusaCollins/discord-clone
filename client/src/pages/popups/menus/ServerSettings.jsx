@@ -54,7 +54,7 @@ const ServerSettings = (
     setInput({...input, systemMessages: selectedServer.channels.filter(channel => channel.systemMessages === true)[0]?.name})
     if(selectedPage !== 2){
       selectRole(selectedServer.serverRoles[0])
-    }
+    } //eslint-disable-next-line
   },[selectedServer, popup])
   useEffect(()=> {
     if(selectedServer !== null && selectedServer !== undefined && selectedRole !== null && selectedRole !== undefined){
@@ -69,7 +69,7 @@ const ServerSettings = (
       }else{
         setUnsavedChanges(false)
       }
-    }
+    }//eslint-disable-next-line
   },[input, selectedFile])
 
   function removeRole(selectedUser){
@@ -280,6 +280,7 @@ const ServerSettings = (
                   <div>
                     <button className='bg-blue-50 hover:bg-blue-200 px-3 py-2 mb-5 text-ssm rounded-sm w-full transition-all' onClick={() => setPopup({...popup, addMembers: true})}>Add Members</button>
                     <div className='flex flex-col overflow-auto h-[500px]'>
+                      {/* eslint-disable-next-line */}
                       {selectedServer.serverUsers.map((user, index) => {
                         if(user.roles[0] === selectedRole.name) {
                           return (
